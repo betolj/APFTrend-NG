@@ -31,6 +31,7 @@ int getUserSignal(const int type, const int idx, const int i, const datetime &ti
         // OPEN position
         bool longtest = false;
         bool shorttest = false;
+
         if (pricestats.bars_day>2 && idx>1) {
            if (longtest && high[idx]-open[idx]<400) {
               ret=1;
