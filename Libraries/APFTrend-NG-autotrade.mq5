@@ -49,6 +49,7 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
      long fullcandle_height = getHeightInPixels(0, high[i-1], low[i-1]);
      long hi_candleheight = getHeightInPixels(0, high[i-1], MathMax(open[i-1],close[i-1]));
      long lo_candleheight = getHeightInPixels(0, MathMin(open[i-1],close[i-1]),low[i-1]);
+     long vwap_candleheight = getHeightInPixels(1,close[i-1],VWAP[i-1]);
 
      // MA200 V
      if (MFI[i-1]>15 && getHeightInPixels(0,MA200[i-1],close[i-1])>candle_height/2)
@@ -135,6 +136,23 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            }
         }
 
+        if (filter.VWAP_CROSS && pricestats.bars_day>4 && candle_height>8 && date_candle.hour<17) {
+           if (body_up>0 && hi_candleheight<3 && close[i-1]>high[i-2]) {
+              if (filter.SAR_INVERTBUY) aux_dir++;
+              if (ADX[i-1]>upADX[i-1] && upADX[i-1]>loADX[i-1] && upADX[i-2]<loADX[i-2]) aux_dir++;
+              if (close[i-1]>VWAP[i-1] && vwap_candleheight>5 && close[i-2]<VWAP[i-2])
+                 if (ADX[i-1]>=upADX[i-1] && getHeightInPixels(0,upBand2[i-1],high[i-1])>candle_height)
+                    aux_dir+=9;
+           }
+           else if (body_down>0 && lo_candleheight<3 && close[i-1]<low[i-2]) {
+              if (filter.SAR_INVERTSELL) aux_dir--;
+              if (ADX[i-1]<loADX[i-1] && upADX[i-1]<loADX[i-1] && upADX[i-2]>loADX[i-2]) aux_dir--;
+              if (close[i-1]<VWAP[i-1] && vwap_candleheight>5 && close[i-2]>VWAP[i-2])
+                 if (ADX[i-1]<=loADX[i-1] && upADX[i-1]<loADX[i-1] && upADX[i-2]>loADX[i-2] && getHeightInPixels(0,low[i-1],loBand2[i-1])>candle_height)
+                    aux_dir-=9;
+           }
+        }
+
         if (filter.VWAP_CROSS && getHeightInPixels(1,MA100[i-1],MA25[i-1])<15 && (getHeightInPixels(1,MA100[i-1],MA50[i-1])<candle_height/3 || getHeightInPixels(1,MA50[i-1],MA25[i-1])<candle_height/3 || (getHeightInPixels(1,MA100[i-1],MA50[i-1])<fullcandle_height/2 && getHeightInPixels(1,MA50[i-1],MA25[i-1])<fullcandle_height)));
         else if (date_candle.hour>9 && date_candle.hour<17) {
            // BBands2
@@ -210,12 +228,15 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
                        if (aux_dir>3 && high[i-1]>MA200[i-1] && close[i-1]<MA200[i-1]) aux_dir--;
                        if (aux_dir>3 && MAFast[i-1]<MA25[i-1] && MA50[i-1]<MA50[i-2] && body_up>0 && getHeightInPixels(1,MA100[i-1],MA50[i-1])<candle_height/2) aux_dir--;
                        if (aux_dir>3 && MA200[i-1]<MA200[i-2] && getHeightInPixels(0,MA200[i-1],high[i-1])<candle_height/2 && candle_height>15) aux_dir--;
+                       if (aux_dir>3 && mycounters.sarbuy>5 && date_candle.hour>12 && RSI[i-1]>65 && open[i-1]>upBand[i-1] && getHeightInPixels(0,upBand2[i-1],high[i-1])<9) aux_dir--;
                        if (aux_dir>3 && filter.VWAP_DOWN && mycounters.sarsell>1 && getHeightInPixels(0,SAR[i-1],high[i-1])>candle_height && MAFast[i-1]<MA25[i-1] && close[i-1]<VWAP[i-1]) aux_dir--;
                        if (aux_dir>3 && date_candle.hour>14 && mycounters.sarbuy>4 && MA200[i-2]>MA200[i-1] && getHeightInPixels(0,MA200[i-1],MA100[i-1])>10 && getHeightInPixels(0,MA100[i-1],MA50[i-1])>10 && RSI[i-1]>71) aux_dir--;
                        if (aux_dir>3 && MAFast[i-2]<MA100[i-2] && low[i-2]<MAFast[i-2] && high[i-1]>MA100[i-1] && candle_hi>0 && body_up>0 && (getHeightInPixels(0,SAR[i-1],high[i-1])>candle_height || (mycounters.sarbuy>1 && getHeightInPixels(0,low[i-1],SAR[i-1])>2*fullcandle_height))) aux_dir--;
                        if (aux_dir>3 && filter.tdf_color!=1 && RSI[i-1]>60 && stdDev[i-1]<stdDev[i-2] && stdDev[i-2]<stdDev[i-3] && filter.VWAP_CROSS && hi_candleheight>2 && close[i-1]<upBand[i-1] && upADX[i-2]<loADX[i-2] && ADX[i-1]<upADX[i-1] && ADX[i-1]<loADX[i-1] && MathAbs(ADX[i-1]-ADX[i-2])<0.3) aux_dir--;
                     }
+
                     if (aux_dir>3 && hi_candleheight>10 && ADX[i-1]<ADX[i-2] && close[i-1]<open[i-3] && getHeightInPixels(0,high[i-3],high[i-1])>10) aux_dir=0;
+                    if (aux_dir>3 && hi_candleheight>3 && (filter.HILO_SELL || filter.VWAP_CROSS) && mycounters.sarsell>1 && mycounters.c_up==1 && close[i-1]<high[i-1] && open[i-1]<miBand[i-1] && high[i-1]<upBand[i-1]) aux_dir=0;
                     if (filter.MIBAND_UP && filter.VWAP_UP && hi_candleheight<5 && close[i-1]>miBand[i-1] && high[i-1]<upBand2[i-1]) aux_dir++;
                  }
                  else if (body_down>0 && candle_height>11 && mycounters.c_down<3 && close[i-1]<MAFast[i-1]) {
@@ -230,22 +251,16 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
                        if (aux_dir<-3 && low[i-1]<MA200[i-1] && close[i-1]>MA200[i-1]) aux_dir++;
                        if (aux_dir<-3 && MAFast[i-1]>MA25[i-1] && MA50[i-1]>MA50[i-2] && body_down>0 && getHeightInPixels(1,MA100[i-1],MA50[i-1])<candle_height/2) aux_dir++;
                        if (aux_dir<-3 && MA200[i-1]>MA200[i-2] && getHeightInPixels(0,low[i-1],MA200[i-1])<candle_height/2 && candle_height>15) aux_dir++;
+                       if (aux_dir<-3 && mycounters.sarsell>5 && date_candle.hour>12 && RSI[i-1]<35 && open[i-1]<loBand[i-1] && getHeightInPixels(0,low[i-1],loBand2[i-1])<9) aux_dir++;
                        if (aux_dir<-3 && filter.VWAP_UP && mycounters.sarbuy>1 && getHeightInPixels(0,low[i-1],SAR[i-1])>candle_height && MAFast[i-1]>MA25[i-1] && close[i-1]>VWAP[i-1]) aux_dir++;
                        if (aux_dir<-3 && date_candle.hour>14 && mycounters.sarsell>4 && MA200[i-2]<MA200[i-1] && getHeightInPixels(0,MA100[i-1],MA200[i-1])>10 && getHeightInPixels(0,MA50[i-1],MA100[i-1])>10 && RSI[i-1]<30) aux_dir++;
                        if (aux_dir<-3 && MAFast[i-2]>MA100[i-2] && high[i-2]>MAFast[i-2] && low[i-1]<MA100[i-1] && candle_lo>0 && body_down>0 && (getHeightInPixels(0,low[i-1],SAR[i-1])>2*candle_height || (mycounters.sarsell>1 && getHeightInPixels(0,SAR[i-1],high[i-1])>2*fullcandle_height))) aux_dir++;
-                       if (aux_dir>3 && filter.tdf_color!=2 && RSI[i-1]<40 && stdDev[i-1]<stdDev[i-2] && stdDev[i-2]<stdDev[i-3] && filter.VWAP_CROSS && lo_candleheight>2 && close[i-1]>loBand[i-1] && upADX[i-2]>loADX[i-2] && ADX[i-1]<upADX[i-1] && ADX[i-1]<loADX[i-1] && MathAbs(ADX[i-1]-ADX[i-2])<0.3) aux_dir++;
+                       if (aux_dir<-3 && filter.tdf_color!=2 && RSI[i-1]<40 && stdDev[i-1]<stdDev[i-2] && stdDev[i-2]<stdDev[i-3] && filter.VWAP_CROSS && lo_candleheight>2 && close[i-1]>loBand[i-1] && upADX[i-2]>loADX[i-2] && ADX[i-1]<upADX[i-1] && ADX[i-1]<loADX[i-1] && MathAbs(ADX[i-1]-ADX[i-2])<0.3) aux_dir++;
                     }
+                    
                     if (aux_dir<-3 && lo_candleheight>10 && ADX[i-1]<ADX[i-2] && close[i-1]>open[i-3] && getHeightInPixels(0,low[i-1],low[i-3])>10) aux_dir=0;
+                    if (aux_dir<-3 && lo_candleheight>3 && (filter.HILO_BUY || filter.VWAP_CROSS) && mycounters.sarbuy>1 && mycounters.c_down==1 && close[i-1]>low[i-1] && open[i-1]>miBand[i-1] && low[i-1]>loBand[i-1]) aux_dir=0;
                     if (filter.MIBAND_DOWN && filter.VWAP_DOWN && lo_candleheight<5 && close[i-1]<miBand[i-1] && low[i-1]>loBand2[i-1]) aux_dir--;
-                 }
-
-                 // Using ADX
-                 if ((i-1)-pricestats.vwap_idx<5) {
-                    if (body_up>pts_size) {
-                       //if (upADX[i-1]>loADX[i-2] && (upADX[i-2]<loADX[i-3] || upADX[i-3]<loADX[i-4]))
-                       //   if (close[i-1]>MAFast[i-1] && close[i-1]>miBand[i-1] && close[i-1]<upBand2[i-1])
-                       //      aux_dir+=10;
-                    }
                  }
               }
            }
