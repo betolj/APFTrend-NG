@@ -174,17 +174,44 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
               if (body_up>0 && body_up>3*candle_height && close[i-1]>high[i-2] && close[i-1]>MAFast[i-1])
                  if (mycounters.c_up<4 && MA25[i-1]>MA50[i-1] && MAFast[i-1]>MA25[i-1] && close[i-1]<upBand2[i-2])
                     aux_dir+=10;
+
+           if (filter.NO_VWAPCROSS && date_candle.hour>10 && date_candle.hour<16 && candle_height>15 && MAFastSize>8 && vwap_candleheight>25) {
+              if (mycounters.c_up<3 && body_up>0) {
+                 if (mycounters.c_up==1 && RSI[i-2]<30 && (date_candle.hour==11 || (date_candle.hour>13 && date_candle.hour<16)) && high[i-1]<VWAP[i-1] && body_up>0 && hi_candleheight<10 && body_up>3*candle_hi && close[i-1]>high[i-2])
+                    if (open[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && open[i-1]<HILO2[i-1] && getHeightInPixels(0,MA25[i-1],close[i-1])>5 && getHeightInPixels(0,close[i-1],HILO2[i-1])>5) aux_dir+=15;
+
+                 if (filter.HILO_BUY && filter.VWAP_UP && RSI[i-1]<75 && MFI[i-1]<75 && Force[i-1]>0 && open[i-1]<MAFast[i-1] && open[i-1]>VWAP[i-1] && body_up>aux_abslast)
+                    if (hi_candleheight<4 && vwap_candleheight<200 && open[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && open[i-1]<HILO2[i-1] && close[i-1]>HILO2[i-1])
+                       if (MAFast[i-1]>MAFast[i-2] && MA25[i-1]>MA25[i-2] && MA50[i-1]>MA50[i-2] && MA100[i-1]>MA100[i-2] && MAFast[i-1]>MA25[i-1] && MA25[i-1]>MA50[i-1] && MA50[i-1]>MA100[i-1])
+                          aux_dir+=10;
+              }
+              else if (mycounters.c_down<3 && body_down>0) {
+                 if (mycounters.c_down==1 && RSI[i-2]>69 && (date_candle.hour==11 || (date_candle.hour>13 && date_candle.hour<16)) && low[i-1]>VWAP[i-1] && body_down>0 && lo_candleheight<10 && body_down>3*candle_lo && close[i-1]<low[i-2])
+                    if (open[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1] && open[i-1]>HILO2[i-1] && getHeightInPixels(0,close[i-1],MA25[i-1])>5 && getHeightInPixels(0,HILO2[i-1],close[i-1])>5) aux_dir-=15;
+
+                 if (filter.HILO_SELL && filter.VWAP_DOWN && RSI[i-2]>25 && MFI[i-1]>30 && Force[i-1]<0 && open[i-1]>MAFast[i-1] && open[i-1]<VWAP[i-1] && body_down>2*aux_abslast)
+                    if (lo_candleheight<4 && vwap_candleheight<200 && open[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1] && open[i-1]>HILO2[i-1] && close[i-1]<HILO2[i-1])
+                       if (MAFast[i-1]<MAFast[i-2] && MA25[i-1]<MA25[i-2] && MA50[i-1]<MA50[i-2] && MA100[i-1]<MA100[i-2] && MA200[i-1]<MA200[i-2] && MAFast[i-1]<MA25[i-1] && MA25[i-1]<MA50[i-1] && MA50[i-1]<MA100[i-1])
+                          aux_dir-=9;
+              }
+           }
         }
 
         // MA Trade
-        if (filter.VWAP_CROSS && pricestats.bars_day>6 && date_candle.hour<15 && candle_height>6 && vwap_candleheight>3)  {
-           if (body_up>0 && candle_hi<body_up && hi_candleheight<12 && mycounters.c_up<4 && aux_dir>-4 && close[i-1]>VWAP[i-1] && open[i-2]<VWAP[i-2])
-              if (high[i-1]>high[i-2] && low[i-1]>low[i-2] && RSI[i-1]<65 && MFI[i-1]<80 && MAFast[i-1]>=MAFast[i-2] && MAFast[i-1]>MA25[i-1])
+        if (filter.VWAP_CROSS && pricestats.bars_day>4 && date_candle.hour<15 && candle_height>6) {
+           if (pricestats.bars_day==5 && filter.HILO_BUY && candle_height>10 && body_up>0 && body_up>candle_hi && MFI[i-1]<80 && Force[i-1]>0 && stdDev[i-1]<3*body_up && (hi_candleheight<5 || lo_candleheight<5))
+              if (mycounters.sarbuy>1 && mycounters.c_up<3 && open[i-3]>VWAP[i-3] && close[i-2]<VWAP[i-2] && close[i-1]>VWAP[i-1] && close[i-1]>MAFast[i-1] && MAFast[i-1]>MAFast[i-2])
                  aux_dir+=10;
 
-           if (body_down>0 && candle_lo<body_down && lo_candleheight<12 && mycounters.c_down<3 && aux_dir<4 && close[i-1]<VWAP[i-1] && open[i-2]>VWAP[i-2])
-              if (low[i-1]<low[i-2] && high[i-1]<high[i-2] && RSI[i-1]>32 && MFI[i-1]>20 && MAFast[i-1]<=MAFast[i-2] && MAFast[i-1]<MA25[i-1])
-                 aux_dir-=10;
+           if (pricestats.bars_day>6 && vwap_candleheight>3)  {
+              if (body_up>0 && candle_hi<body_up && hi_candleheight<12 && mycounters.c_up<4 && aux_dir>-4 && close[i-1]>VWAP[i-1] && open[i-2]<VWAP[i-2])
+                 if (high[i-1]>high[i-2] && low[i-1]>low[i-2] && RSI[i-1]<65 && MFI[i-1]<80 && MAFast[i-1]>=MAFast[i-2] && MAFast[i-1]>MA25[i-1])
+                    aux_dir+=10;
+
+              if (body_down>0 && candle_lo<body_down && lo_candleheight<12 && mycounters.c_down<3 && aux_dir<4 && close[i-1]<VWAP[i-1] && open[i-2]>VWAP[i-2])
+                 if (low[i-1]<low[i-2] && high[i-1]<high[i-2] && RSI[i-1]>32 && MFI[i-1]>20 && MAFast[i-1]<=MAFast[i-2] && MAFast[i-1]<MA25[i-1])
+                    aux_dir-=10;
+           }
         }
 
         if (filter.VWAP_CROSS && getHeightInPixels(1,MA100[i-1],MA25[i-1])<15 && (getHeightInPixels(1,MA100[i-1],MA50[i-1])<candle_height/3 || getHeightInPixels(1,MA50[i-1],MA25[i-1])<candle_height/3 || (getHeightInPixels(1,MA100[i-1],MA50[i-1])<fullcandle_height/2 && getHeightInPixels(1,MA50[i-1],MA25[i-1])<fullcandle_height)));
@@ -311,12 +338,24 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
               }
            }
         }
+
         // Mandatory MA200
         if (date_candle.day_of_week<5 && !filter.VWAP_CROSS && candle_height>10) {
            if (mycounters.c_up<3 && body_up>0 && body_up>3*candle_hi && close[i-1]>high[i-2] && aux_abslast<MathAbs(open[i-3]-close[i-3])/2)
               if (MFI[i-2]<32 && vwap_distance>30 && high[i-1]<VWAP[i-1] && high[i-1]<VWAP[i-1] && ((MA100[i-1]>MA100[i-2] && open[i-1]<MA100[i-1] && close[i-1]>MA100[i-1]) || (MA200[i-1]>MA200[i-2] && open[i-1]<MA200[i-1] && close[i-1]>MA200[i-1])))
                  aux_dir+=10;
         }
+
+        // Mandatory protection
+        if (filter.NO_VWAPCROSS) {
+           if (aux_dir>3) {
+              if (date_candle.hour>15 && filter.HILO_SELL && filter.VWAP_DOWN && high[i-1]<VWAP[i-1] && MA100[i-1]>MA50[i-1] && MA50[i-1]>MA25[i-1] && MAFast[i-1]<MA25[i-1] && close[i-1]<MAFast[i-1]) aux_dir=0;
+           }
+           else if (aux_dir<-3) {
+              if (date_candle.hour>15 && filter.HILO_BUY && filter.VWAP_UP && low[i-1]>VWAP[i-1] && MA25[i-1]>MA50[i-1] && MA50[i-1]>MA100[i-1] && MAFast[i-1]>MA25[i-1] && close[i-1]>MAFast[i-1]) aux_dir=0;
+           }
+        }
+
         // Mandatory force_trade
         if (force_trade==10) aux_dir=+10;
         if (force_trade==-20) aux_dir=-10;
