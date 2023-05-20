@@ -339,13 +339,6 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            }
         }
 
-        // Mandatory MA200
-        if (date_candle.day_of_week<5 && !filter.VWAP_CROSS && candle_height>10) {
-           if (mycounters.c_up<3 && body_up>0 && body_up>3*candle_hi && close[i-1]>high[i-2] && aux_abslast<MathAbs(open[i-3]-close[i-3])/2)
-              if (MFI[i-2]<32 && vwap_distance>30 && high[i-1]<VWAP[i-1] && high[i-1]<VWAP[i-1] && ((MA100[i-1]>MA100[i-2] && open[i-1]<MA100[i-1] && close[i-1]>MA100[i-1]) || (MA200[i-1]>MA200[i-2] && open[i-1]<MA200[i-1] && close[i-1]>MA200[i-1])))
-                 aux_dir+=10;
-        }
-
         // Mandatory protection
         if (filter.NO_VWAPCROSS) {
            if (aux_dir>3) {
@@ -354,6 +347,13 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            else if (aux_dir<-3) {
               if (date_candle.hour>15 && filter.HILO_BUY && filter.VWAP_UP && low[i-1]>VWAP[i-1] && MA25[i-1]>MA50[i-1] && MA50[i-1]>MA100[i-1] && MAFast[i-1]>MA25[i-1] && close[i-1]>MAFast[i-1]) aux_dir=0;
            }
+        }
+
+        // Mandatory MA200
+        if (date_candle.day_of_week<5 && !filter.VWAP_CROSS && candle_height>10) {
+           if (mycounters.c_up<3 && body_up>0 && body_up>3*candle_hi && close[i-1]>high[i-2] && aux_abslast<MathAbs(open[i-3]-close[i-3])/2)
+              if (MFI[i-2]<32 && vwap_distance>30 && high[i-1]<VWAP[i-1] && high[i-1]<VWAP[i-1] && ((MA100[i-1]>MA100[i-2] && open[i-1]<MA100[i-1] && close[i-1]>MA100[i-1]) || (MA200[i-1]>MA200[i-2] && open[i-1]<MA200[i-1] && close[i-1]>MA200[i-1])))
+                 aux_dir+=10;
         }
 
         // Mandatory force_trade
