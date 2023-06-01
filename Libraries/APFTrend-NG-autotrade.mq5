@@ -90,9 +90,9 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
      }
 
      //VWAP revert
-     if (filter.VWAP_CROSS && date_candle.hour>11 && date_candle.hour<16 && candle_height>15) {
+     if (filter.VWAP_CROSS && date_candle.hour>10 && date_candle.hour<16 && candle_height>15) {
         if (!filter.VWAP_UP && body_down>0 && lo_candleheight<5 && close[i-1]<low[i-2] && close[i-1]<(open[i-3]+close[i-3])/2 && open[i-3]<VWAP[i-3] && low[i-2]>VWAP[i-2] && close[i-1]<VWAP[i-1]) aux_dir-=9;
-        if (!filter.VWAP_DOWN && body_up>0 && hi_candleheight<5 && close[i-1]>high[i-2] && close[i-1]>(open[i-3]+close[i-3])/2 && open[i-3]>VWAP[i-3] && high[i-2]<VWAP[i-2] && close[i-1]>VWAP[i-1]) aux_dir+=9;
+        if (!filter.VWAP_DOWN && body_up>0 && hi_candleheight<5 && close[i-1]>high[i-2] && close[i-1]>(open[i-3]+close[i-3])/2 && open[i-3]>VWAP[i-3] && high[i-2]<VWAP[i-2] && close[i-1]>VWAP[i-1]) aux_dir+=9;     
      }
 
      // Invert to Short
@@ -279,6 +279,17 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
               }
            }
         }
+        // Hilo x TDF trade
+        if (date_candle.hour>10 && date_candle.hour<16 && candle_height>10 && filter.VWAP_CROSS && date_candle.day_of_week<5) {
+           if (filter.HILO_INVERTBUY && filter.tdf_color!=2 && MFI[i-1]<90 && MFI[i-1]>20 && Force[i-1]>0 && body_up>0 && body_up>3*candle_hi && hi_candleheight<8 && MAFastSize>5) {
+              if (close[i-1]>high[i-2] && low[i-2]<MAFast[i-2] && close[i-1]>MAFast[i-1] && low[i-2]<MA50[i-2] && close[i-1]>MA50[i-1])
+                 aux_dir+=15;
+           }
+           else if (filter.HILO_INVERTSELL && filter.tdf_color!=1 && MFI[i-1]>20 && MFI[i-1]<80 && Force[i-1]<0 && body_down>0 && body_down>3*candle_lo && lo_candleheight<8 && MAFastSize>5) {
+              if (close[i-1]<high[i-2] && high[i-2]>MAFast[i-2] && close[i-1]<MAFast[i-1] && high[i-2]>MA50[i-2] && close[i-1]<MA50[i-1])
+                 aux_dir-=15;
+           }
+        }
 
         // MA Trade
         if (filter.VWAP_CROSS && pricestats.bars_day>4 && date_candle.hour<15 && candle_height>6) {
@@ -430,9 +441,13 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
         if (filter.NO_VWAPCROSS) {
            if (aux_dir>3) {
               if (date_candle.hour>15 && filter.HILO_SELL && filter.VWAP_DOWN && high[i-1]<VWAP[i-1] && MA100[i-1]>MA50[i-1] && MA50[i-1]>MA25[i-1] && MAFast[i-1]<MA25[i-1] && close[i-1]<MAFast[i-1]) aux_dir=0;
+              else if (filter.VWAP_CROSS && date_candle.hour<11 && pricestats.max_dayprice-high[i-1]<1 && hi_candleheight>30 && high[i-1]>upBand2[i-1]) aux_dir=0;
+              else if (close[i-1]>VWAP[i-1] && close[i-1]<high[i-3] && candle_hi>2*aux_abs && candle_lo>2*aux_abs) aux_dir--;
            }
            else if (aux_dir<-3) {
               if (date_candle.hour>15 && filter.HILO_BUY && filter.VWAP_UP && low[i-1]>VWAP[i-1] && MA25[i-1]>MA50[i-1] && MA50[i-1]>MA100[i-1] && MAFast[i-1]>MA25[i-1] && close[i-1]>MAFast[i-1]) aux_dir=0;
+              else if (filter.VWAP_CROSS && date_candle.hour<11 && low[i-1]-pricestats.min_dayprice<1 && lo_candleheight>30 && low[i-1]<loBand2[i-1]) aux_dir=0;
+              else if (close[i-1]<VWAP[i-1] && close[i-1]>low[i-3] && candle_hi>2*aux_abs && candle_lo>2*aux_abs) aux_dir++;
            }
         }
 
