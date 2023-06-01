@@ -24,6 +24,22 @@ if (Period_MAFAST>0) MAFAST_Period=Period_MAFAST;
        return(INIT_FAILED);
     }
 
+  // Handle for iRSI
+  hRSI = iRSI(NULL, PERIOD_CURRENT, Default_Period, applied_price);
+    if (hRSI==INVALID_HANDLE) {
+        PrintFormat("Failed to create handle of the RSI indicator for the symbol %s, error code %d",
+                    "APFTrend-NG", GetLastError());
+        return(INIT_FAILED);
+    }
+
+  // Handle for MFI
+  hMFI=iMFI(NULL, PERIOD_CURRENT, 5, VOLUME_TICK);
+    if (hMFI==INVALID_HANDLE) {
+        PrintFormat("Failed to create handle of the MFI indicator for the symbol %s, error code %d",
+                    "APFTrend-NG", GetLastError());
+        return(INIT_FAILED);
+    }
+
 if (trade_mode<3) {
   // Handle for optional iCustom HILO
   f.use_hilo=1;
@@ -50,22 +66,6 @@ if (trade_mode<3) {
        return(INIT_FAILED);
     }
    
-  // Handle for iRSI
-  hRSI = iRSI(NULL, PERIOD_CURRENT, Default_Period, applied_price);
-    if (hRSI==INVALID_HANDLE) {
-        PrintFormat("Failed to create handle of the RSI indicator for the symbol %s, error code %d",
-                    "APFTrend-NG", GetLastError());
-        return(INIT_FAILED);
-    }
-
-  // Handle for MFI
-  hMFI=iMFI(NULL, PERIOD_CURRENT, 5, VOLUME_TICK);
-    if (hMFI==INVALID_HANDLE) {
-        PrintFormat("Failed to create handle of the MFI indicator for the symbol %s, error code %d",
-                    "APFTrend-NG", GetLastError());
-        return(INIT_FAILED);
-    }
-
   // Handle for iATR
   hATR = iATR(NULL,PERIOD_CURRENT, MAFAST_Period);
     if (hATR==INVALID_HANDLE) {
