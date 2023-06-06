@@ -271,6 +271,8 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
                        if (close[i-1]>VWAP[i-1] && open[i-2]<MAFast[i-2] && close[i-1]>MAFast[i-2] && MAFast[i-1]>MAFast[i-2] && MAFast[i-1]>MA25[i-1] && MA100[i-1]<MA50[i-1] && MA50[i-1]<MA25[i-1])
                           if (close[i-1]>high[i-1] && low[i-1]>low[i-2] && close[i-3]<open[i-3] && close[i-4]<open[i-4]) aux_dir+=12;
                  }
+                 if (date_candle.hour>9 && mycounters.c_up==1 && candle_height>10 && candle_lastheight>10 && body_up>3*candle_hi && close[i-1]>high[i-2])
+                    if (MFI[i-1]<95 && MFI[i-1]>40 && RSI[i-1]>50 && low[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && low[i-1]<MA25[i-1] && close[i-1]>MA25[i-1] && low[i-1]<MA50[i-1] && close[i-1]>MA50[i-1]) aux_dir+=12;
               }
               else if (filter.HILO_SELL && hi_candleheight<10) {
                  if (date_candle.hour<16 && vwap_candleheight<120) {
@@ -278,6 +280,8 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
                        if (close[i-1]<VWAP[i-1] && open[i-2]>MAFast[i-2] && close[i-1]<MAFast[i-2] && MAFast[i-1]<MAFast[i-2] && MAFast[i-1]<MA25[i-1] && MA100[i-1]>MA50[i-1] && MA50[i-1]>MA25[i-1])
                           if (high[i-1]<high[i-2] && close[i-3]>open[i-3] && close[i-4]>open[i-4]) aux_dir-=12;
                  }
+                 if (date_candle.hour>9 && mycounters.c_down==1 && candle_height>10 && candle_lastheight>10 && body_down>3*candle_lo && close[i-1]<low[i-2])
+                    if (MFI[i-1]>15 && MFI[i-1]<60 && RSI[i-1]<50 && high[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1] && high[i-1]>MA25[i-1] && close[i-1]<MA25[i-1] && high[i-1]>MA50[i-1] && close[i-1]<MA50[i-1]) aux_dir-=12;
               }
            }
         }
@@ -291,6 +295,12 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
               if (close[i-1]<high[i-2] && high[i-2]>MAFast[i-2] && close[i-1]<MAFast[i-1] && high[i-2]>MA50[i-2] && close[i-1]<MA50[i-1])
                  aux_dir-=15;
            }
+        }
+        // Hilo x VWAP trade
+        if (filter.VWAP_CROSS && date_candle.hour>9 && candle_height>6 && candle_height<100) {
+           if (filter.HILO_BUY && MFI[i-1]<95 && body_up>0 && low[i-1]>low[i-2])
+              if (close[i-1]>VWAP[i-1] && low[i-2]<VWAP[i-2] && close[i-2]>VWAP[i-2] && low[i-3]<VWAP[i-3] && close[i-3]>VWAP[i-3] && low[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1])
+                 aux_dir+=10;
         }
 
         // MA Trade
@@ -445,12 +455,14 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            if (force_trade==0) {
               if (aux_dir>3) {
                  if (filter.MIBAND_DOWN && close[i-1]<miBand[i-1]) aux_dir-=3;
+                 if (type==1 && close[i-1]<HILO2[i-2] && high[i-1]<open[i-2] && high[i-1]<MathMax(open[i-3],close[i-3])) aux_dir--;
                  if (aux_dir<13 && hi_candleheight>15 && MA200[i-1]<MA200[i-2] && MA100[i-1]<MA200[i-1] && high[i-1]>upBand[i-1]) aux_dir--;
                  if (aux_dir<13 && type==1 && filter.VWAP_CROSS && (close[i-1]<high[i-2] || close[i-1]<high[i-3]) && close[i-1]<MA50[i-1] && MA200[i-1]<MA200[i-2] && MA200[i-1]>MA100[i-1] && MA100[i-1]>MA50[i-1] && MA50[i-1]>MA25[i-1]) aux_dir--;
                  if (aux_dir<13 && type==1 && date_candle.hour<11 && mycounters.c_up==1 && body_up<aux_abslast/2 && candle_hi>0 && close[i-2]<MAFast[i-2]) aux_dir--;
               }
               else if (aux_dir<-3) {
                  if (filter.MIBAND_UP && close[i-1]>miBand[i-1]) aux_dir+=3;
+                 if (type==1 && close[i-1]>HILO2[i-2] && low[i-1]>open[i-2] && low[i-1]>MathMin(open[i-3],close[i-3])) aux_dir++;
                  if (aux_dir>-13 && lo_candleheight>15 && MA200[i-1]>MA200[i-2] && MA100[i-1]>MA200[i-1] && low[i-1]<loBand[i-1]) aux_dir++;
                  if (aux_dir>-13 && type==1 && filter.VWAP_CROSS && (close[i-1]>low[i-2] || close[i-1]>low[i-3]) && close[i-1]>MA50[i-1] && MA200[i-1]>MA200[i-2] && MA200[i-1]<MA100[i-1] && MA100[i-1]<MA50[i-1] && MA50[i-1]<MA25[i-1]) aux_dir++;
                  if (aux_dir>-13 && type==1 && date_candle.hour<11 && mycounters.c_down==1 && body_down<aux_abslast/2 && candle_lo>0 && close[i-2]>MAFast[i-2]) aux_dir++;
