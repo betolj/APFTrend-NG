@@ -122,6 +122,28 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
         }
      }
 
+     // Hilo Invert
+     if (candle_height>6 && date_candle.hour>9 && (type==0 || (type==1 && date_candle.hour<16))) {
+        if (filter.HILO_INVERTBUY && Force[i-1]>0 && RSI[i-1]>45 && MFI[i-1]>55 && (type==0 || (type==1 && !filter.VWAP_CROSS && stdDev[i-1]>body_up/3 && RSI[i-1]<70 && MFI[i-1]<90 && close[i-1]>LR[i-1]))) {
+          if (high[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1]);
+          else if (high[i-1]>MA50[i-1] && close[i-1]<MA50[i-1] && (body_up<aux_abslast || date_candle.hour<14));
+          else if (high[i-1]>VWAP[i-1] && close[i-1]<VWAP[i-1] && (body_up<aux_abslast || date_candle.hour<14));
+          else if (body_up>0 && high[i-1]>high[i-2] && close[i-1]>(open[i-2]+close[i-2])/2 && high[i-1]>HILO2[i-1] && close[i-1]>MAFast[i-1] && MA200[i-1]>MA200[i-2]) {
+             aux_dir+=5;
+             if (type==1 && date_candle.hour>12 && mycounters.sarbuy<10 && candle_height>10 && body_up>candle_hi && stdDev[i-1]<3*body_up && open[i-1]<MAFast[i-1]) aux_dir+=5;
+          }
+        }
+        else if (filter.HILO_INVERTSELL && Force[i-1]<0 && RSI[i-1]<55 && MFI[i-1]<55 && (type==0 || (type==1 && RSI[i-1]>32 && MFI[i-1]>20 && close[i-1]<LR[i-1]))) {
+          if (low[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1]);
+          else if (low[i-1]<MA50[i-1] && close[i-1]>MA50[i-1] && (body_down<aux_abslast || date_candle.hour<14));
+          else if (low[i-1]<VWAP[i-1] && close[i-1]>VWAP[i-1] && (body_down<aux_abslast || date_candle.hour<14));
+          else if (low[i-1]<low[i-2] && close[i-1]<(open[i-2]+close[i-2])/2 && low[i-1]<HILO2[i-1] && close[i-1]<MAFast[i-1]) {
+             aux_dir-=5;
+             if (type==1 && mycounters.sarsell<10 && body_down>0 && body_down>candle_lo && stdDev[i-1]<5*body_down) aux_dir-=5;
+          }
+        }
+     }
+
 
      if (apftrade.trade_dir>0) {
         // Close trades
