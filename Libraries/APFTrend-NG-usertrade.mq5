@@ -12,7 +12,7 @@
 
 int getUserSignal(const int type, const int idx, const int i, const datetime &time[],
         const long &tick_volume[], const double &high[], const double &open[], const double &close[], const double &low[],
-        const double &VWAP[], const double &HILO[], const double &HILO2[], const double &SAR[], const double &RSI[], const double &MFI[], const double &ATR[], const double &LR[],
+        const double &VWAP[], const double &HILO[], const double &HILO2[], const double &SAR[], const double &RSI[], const double &MFI[], const double &ATR[], const double &CCI[], const double &LR[],
         const double &Force[], const double &stdDev[], const double &miBand[], const double &upBand[], const double &loBand[], const double &miBand2[], const double &upBand2[], const double &loBand2[], const double &ADX[], const double &upADX[], const double &loADX[],
         const double &MAFast[], const double &MASlow[], const double &MA25[], const double &MA50[], const double &MA100[], const double &MA200[], stru_filter &filter, stru_trade &apftrade, stru_counters &mycounters, stru_stats &pricestats) export
   {
