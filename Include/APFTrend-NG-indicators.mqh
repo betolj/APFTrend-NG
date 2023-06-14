@@ -65,7 +65,15 @@ if (trade_mode<3) {
                    "APFTrend-NG", GetLastError());
        return(INIT_FAILED);
     }
-   
+
+  // Hangle for CCI
+  hCCI = iCCI(NULL, PERIOD_CURRENT, MAFAST_Period+1, PRICE_TYPICAL);
+    if (hCCI==INVALID_HANDLE) {
+       PrintFormat("Failed to create handle of the CCI indicator for the symbol %s, error code %d",
+                   "APFTrend-NG", GetLastError());
+       return(INIT_FAILED);
+    }
+
   // Handle for iATR
   hATR = iATR(NULL,PERIOD_CURRENT, MAFAST_Period);
     if (hATR==INVALID_HANDLE) {
