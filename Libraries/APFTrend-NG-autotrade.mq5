@@ -20,7 +20,7 @@
 //+------------------------------------------------------------------+
 int getSignal(const int type, const int idx, const int i, const datetime &time[],
         const long &tick_volume[], const double &high[], const double &open[], const double &close[], const double &low[],
-        const double &VWAP[], const double &HILO[], double &HILO2[], const double &SAR[], const double &RSI[], const double &MFI[], const double &ATR[], const double &LR[],
+        const double &VWAP[], const double &HILO[], double &HILO2[], const double &SAR[], const double &RSI[], const double &MFI[], const double &ATR[], const double &CCI[], const double &LR[],
         const double &Force[], const double &stdDev[], const double &miBand[], const double &upBand[], const double &loBand[], const double &miBand2[], const double &upBand2[], const double &loBand2[], const double &ADX[], const double &upADX[], const double &loADX[],
         const double &MAFast[], const double &MASlow[], const double &MA25[], const double &MA50[], const double &MA100[], const double &MA200[], stru_filter &filter, stru_trade &apftrade, stru_counters &mycounters, stru_stats &pricestats) export
   {
@@ -204,6 +204,28 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
      }
      else {
         // Open trades
+
+        // CCI trade
+        if (date_candle.hour>9 && date_candle.hour<16 && candle_height>10 && aux_abs>candle_hi && aux_abs>candle_lo) {
+           if (body_up>0 && (filter.HILO_BUY || filter.SAR_BUY) && mycounters.sarbuy<10 && MFI[i-1]<95 && RSI[i-1]>35 && RSI[i-1]<85) {
+              if (filter.VWAP_CROSS && date_candle.hour==10 && date_candle.min>10 && CCI[i-1]>-50) {
+                 if (filter.HILO_BUY && close[i-1]>HILO2[i-2] && MAFast[i-1]>MA25[i-1] && close[i-1]>MAFast[i-1]) aux_dir+=10;
+              }
+              else if (!filter.VWAP_CROSS && CCI[i-1]<140) {
+                 if (CCI[i-1]>0 && CCI[i-2]<-50 && close[i-1]>LR[i-1]) aux_dir+=3;
+                 if (CCI[i-1]>-45 && CCI[i-2]<-110 && MFI[i-1]<90 && RSI[i-1]>40) aux_dir++;
+              }
+           }
+           else if (body_down>0 && (filter.HILO_SELL || filter.SAR_SELL) && mycounters.sarsell<10 && MFI[i-1]>15 && RSI[i-1]<65 && RSI[i-1]>15) {
+              if (filter.VWAP_CROSS && date_candle.hour==10 && date_candle.min>10 && CCI[i-1]<50) {
+                 if (filter.HILO_SELL && close[i-1]<HILO2[i-2] && MAFast[i-1]<MA25[i-1] && close[i-1]<MAFast[i-1]) aux_dir-=10;
+              }
+              else if (!filter.VWAP_CROSS && CCI[i-1]>-140) {
+                 if (CCI[i-1]<0 && CCI[i-2]>50 && close[i-1]<LR[i-1]) aux_dir-=3;
+                 if (CCI[i-1]<55 && CCI[i-2]>110 && MFI[i-1]>20 && RSI[i-1]<60) aux_dir--;
+              }
+           }
+        }
 
         // Price action
         if (candle_height>10) {
@@ -526,6 +548,12 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
         // Mandatory force_trade
         if (force_trade==10) aux_dir=+10;
         if (force_trade==-20) aux_dir=-10;
+
+        // CCI Mandatory protection
+        if (date_candle.hour<15) {
+           if (aux_dir>3 && (filter.HILO_SELL || filter.SAR_SELL) && CCI[i-1]<-49 && CCI[i-2]<-80 && RSI[i-1]<50) aux_dir=0;
+           else if (aux_dir<-3 && (filter.HILO_BUY || filter.SAR_BUY) && CCI[i-1]>51 && CCI[i-2]>80 && RSI[i-1]>50) aux_dir=0;
+        }
      }
 
 
