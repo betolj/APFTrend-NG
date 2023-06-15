@@ -45,7 +45,6 @@ int OnInit()
    
    hMAHigh = iMA(_Symbol, PERIOD_CURRENT, Lb, 0, MA_Method, PRICE_HIGH);
    hMALow = iMA(_Symbol, PERIOD_CURRENT, Lb, 0, MA_Method, PRICE_LOW);
-
    
    if(hMAHigh==INVALID_HANDLE)Print(" Failed to get handle of the iMA indicator");
    if(hMALow==INVALID_HANDLE)Print(" Failed to get handle of the iMA indicator");
@@ -91,7 +90,7 @@ int OnCalculate(const int rates_total,
    for(i=limit; i>=0; i--)
    {
    
-      Hlv[i]=Hlv[i+1];
+      if (i<limit) Hlv[i]=Hlv[i+1];
       
       if (close[rates_total-1-i] > MAHigh[limit-i]) Hlv[i]= 1;
       if (close[rates_total-1-i] < MALow[limit-i]) Hlv[i]= -1;
