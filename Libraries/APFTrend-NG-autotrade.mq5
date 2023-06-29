@@ -225,10 +225,10 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
         }
         if (aux_dir>1 && (type==1 || apftrade.trade_dir==1)) {
            if (stdDev[i-1]>4*aux_abs) aux_dir--;
-           if (MFI[i-1]>90) aux_dir--;
-           if (MFI[i-1]>82 && filter.VWAP_CROSS && type==1) aux_dir--;
-           if (high[i-1]>MA25[i-1] && close[i-1]<MA25[i-1]) aux_dir--;
-           if (high[i-1]>MA200[i-1] && close[i-1]<MA200[i-1]) aux_dir--;
+           if (aux_dir>0 && MFI[i-1]>90) aux_dir--;
+           if (aux_dir>0 && MFI[i-1]>82 && filter.VWAP_CROSS && type==1) aux_dir--;
+           if (aux_dir>0 && high[i-1]>MA25[i-1] && close[i-1]<MA25[i-1]) aux_dir--;
+           if (aux_dir>0 && high[i-1]>MA200[i-1] && close[i-1]<MA200[i-1]) aux_dir--;
            if (type==1 && aux_dir>2) {
               if (filter.VWAP_CROSS && force_trade==0 && mycounters.hilobuy>10 && candle_hi>aux_abs/5 && close[i-1]<open[i-3]) aux_dir=0;
               if (mycounters.hilobuy>12) aux_dir--;
@@ -337,10 +337,10 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
         }
         if (aux_dir<-1 && (type==1 || apftrade.trade_dir==2)) {
            if (stdDev[i-1]>4*aux_abs) aux_dir++;
-           if (MFI[i-1]<15) aux_dir++;
-           if (MFI[i-1]<10 && filter.VWAP_CROSS && type==1) aux_dir++;
-           if (low[i-1]<MA25[i-1] && close[i-1]>MA25[i-1]) aux_dir++;
-           if (low[i-1]<MA200[i-1] && close[i-1]>MA200[i-1]) aux_dir++;
+           if (aux_dir<0 && MFI[i-1]<15) aux_dir++;
+           if (aux_dir<0 && MFI[i-1]<10 && filter.VWAP_CROSS && type==1) aux_dir++;
+           if (aux_dir<0 && low[i-1]<MA25[i-1] && close[i-1]>MA25[i-1]) aux_dir++;
+           if (aux_dir<0 && low[i-1]<MA200[i-1] && close[i-1]>MA200[i-1]) aux_dir++;
            if (type==1 && aux_dir<-2) {
               if (filter.VWAP_CROSS && force_trade==0 && mycounters.hilosell>10 && candle_lo>aux_abs/5 && close[i-1]>open[i-3]) aux_dir=0;
               if (mycounters.hilosell>12) aux_dir++;
@@ -448,6 +448,7 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
                  if (close[i-1]<LR[i-1]) aux_dir-=2;
               }
               if (aux_dir>2 && date_candle.hour>15 && filter.VWAP_CROSS && high[i-2]<VWAP[i-2] && close[i-1]-VWAP[i-1]<aux_abs/5) aux_dir=0;
+              if (aux_dir>2 && aux_dir<14 && force_trade==0 && pricestats.bars_day<4 && CCI[i-1]>100 && candle_hi>0 && open[i-1]>VWAP[i-1] && low[i-2]<MA25[i-2] && low[i-1]>MA100[i-1] && low[i-1]>MA200[i-1]) aux_dir=0;
            }
            else if (aux_dir<-2) {
               if (force_trade==0 && CCI[i-1]<-130 && close[i-1]<MA200[i-1] && MA200[i-1]<MA100[i-1]) aux_dir++;
@@ -455,7 +456,8 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
                  aux_dir++;
                  if (close[i-1]>LR[i-1]) aux_dir+=2;
               }
-              if (aux_dir>2 && date_candle.hour>15 && filter.VWAP_CROSS && low[i-2]>VWAP[i-2] && VWAP[i-1]-close[i-1]<aux_abs/5) aux_dir=0;
+              if (aux_dir<-2 && date_candle.hour>15 && filter.VWAP_CROSS && low[i-2]>VWAP[i-2] && VWAP[i-1]-close[i-1]<aux_abs/5) aux_dir=0;
+              if (aux_dir<-2 && aux_dir>-13 && force_trade==0 && pricestats.bars_day<4 && CCI[i-1]<-100 && candle_lo>0 && open[i-1]<VWAP[i-1] && high[i-2]>MA25[i-2] && high[i-1]<MA100[i-1] && high[i-1]<MA200[i-1]) aux_dir=0;
            }
         }
      }
