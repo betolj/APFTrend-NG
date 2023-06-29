@@ -189,7 +189,10 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            }
         }
         if (filter.SAR_INVERTBUY) aux_dir+=3;
-        if (filter.HILO_INVERTBUY) aux_dir+=3;
+        if (filter.HILO_INVERTBUY) {
+            aux_dir+=3;
+            if (type==1 && mycounters.c_up==3 && RSI[i-1]>40 && RSI[i-1]<71 && close[i-1]>high[i-2] && body_up>aux_abslast/2 && close[i-1]>miBand[i-1] && open[i-2]<MAFast[i-2] && close[i-1]>MAFast[i-1] && stdDev[i-1]<4*body_up) aux_dir+=5;
+        }
         if (type==1 && close[i-1]>LR[i-1]) aux_dir++;
         if (type==1 && MFI[i-1]<85 && RSI[i-1]>50) {
            if (close[i-2]<VWAP[i-2] && close[i-1]>VWAP[i-1]) aux_dir++;
@@ -301,7 +304,10 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            }
         }
         if (filter.SAR_INVERTSELL) aux_dir-=3;
-        if (filter.HILO_INVERTSELL) aux_dir-=3;
+        if (filter.HILO_INVERTSELL) {
+           aux_dir-=3;
+           if (type==1 && mycounters.c_down==3 && RSI[i-1]<60 && RSI[i-1]>29 && close[i-1]<HILO2[i-1] && close[i-1]<low[i-2] && body_down>aux_abslast/2 && close[i-1]<miBand[i-1] && open[i-2]>MAFast[i-2] && close[i-1]<MAFast[i-1] && stdDev[i-1]<4*body_down && date_candle.hour<16) aux_dir-=5;
+        }
         if (type==1 && close[i-1]<LR[i-1]) aux_dir--;
         if (type==1 && MFI[i-1]>15 && RSI[i-1]<50) {
            if (close[i-2]>VWAP[i-2] && close[i-1]<VWAP[i-1]) aux_dir--;
