@@ -198,6 +198,7 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
                   if (date_candle.hour>9 && date_candle.hour<16 && CCI[i-1]>-30 && MFI[i-1]<90 && body_up>aux_abslast && close[i-1]>high[i-2] && low[i-2]<HILO[i-2] && close[i-1]>HILO2[i-1] && close[i-1]>MAFast[i-1] && close[i-1]<upBand[i-1]) aux_dir+=3;
                   else if (mycounters.c_up==3 && RSI[i-1]>40 && RSI[i-1]<71 && close[i-1]>high[i-2] && body_up>aux_abslast/2 && close[i-1]>miBand[i-1] && open[i-2]<MAFast[i-2] && close[i-1]>MAFast[i-1] && stdDev[i-1]<4*body_up) aux_dir+=5;
                }
+               if (pricestats.bars_day>6 && date_candle.hour<15 && CCI[i-1]>30 && CCI[i-1]<220 && body_up>0 && open[i-1]>VWAP[i-1] && open[i-3]<VWAP[i-3] && close[i-1]>high[i-2] && low[i-2]<MAFast[i-2] && close[i-1]>MAFast[i-1]) aux_dir+=5;
             }
         }
         if (type==1 && close[i-1]>LR[i-1]) aux_dir++;
@@ -322,6 +323,7 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
                  if (date_candle.hour>9 && date_candle.hour<16 && CCI[i-1]<30 && MFI[i-1]>10 && body_down>aux_abslast && close[i-1]<low[i-2] && high[i-2]>HILO[i-2] && close[i-1]<HILO2[i-1] && close[i-1]<MAFast[i-1] && close[i-1]>loBand[i-1]) aux_dir-=3;
                  else if (mycounters.c_down==3 && RSI[i-1]<60 && RSI[i-1]>29 && close[i-1]<HILO2[i-1] && close[i-1]<low[i-2] && body_down>aux_abslast/2 && close[i-1]<miBand[i-1] && open[i-2]>MAFast[i-2] && close[i-1]<MAFast[i-1] && stdDev[i-1]<4*body_down && date_candle.hour<16) aux_dir-=5;
               }
+              if (pricestats.bars_day>6 && date_candle.hour<15 && CCI[i-1]<-30 && CCI[i-1]>-220 && body_down>0 && open[i-1]<VWAP[i-1] && open[i-3]>VWAP[i-3] && close[i-1]<low[i-2] && high[i-2]>MAFast[i-2] && close[i-1]<MAFast[i-1]) aux_dir-=5;
            }
         }
         if (type==1 && close[i-1]<LR[i-1]) aux_dir--;
