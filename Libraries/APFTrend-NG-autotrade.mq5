@@ -215,7 +215,10 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            if (close[i-2]<loBand2[i-2] && close[i-1]>loBand2[i-1] && CCI[i-1]>-50) aux_dir+=2;
            if (filter.HILO_BUY && CCI[i-1]<130 && MFI[i-1]<80 && stdDev[i-1]<3*aux_abs && body_up>0 && body_up>2*candle_hi && close[i-1]>high[i-2] && open[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && close[i-1]>HILO2[i-1]) {
               if (date_candle.hour>15 && low[i-1]>VWAP[i-1]);
-              else aux_dir+=2;
+              else {
+                 aux_dir+=2;
+                 if ((filter.HILO_INVERTBUY || filter.SAR_INVERTBUY || mycounters.c_up>1) && mycounters.hilobuy<3 && date_candle.hour>10 && date_candle.hour<15 && RSI[i-1]<71 && close[i-1]>high[i-2] && open[i-1]<MA25[i-1] && close[i-1]>MA25[i-1]) aux_dir+=5;
+              }
            }
            if (CCI[i-1]>140 && VWAP[i-1]-open[i-1]>2*(close[i-1]-VWAP[i-1]));
            else {
@@ -342,7 +345,10 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            if (close[i-2]>upBand2[i-2] && close[i-1]<upBand2[i-1] && CCI[i-1]<50) aux_dir-=2;
            if (filter.HILO_SELL && CCI[i-1]>-140 && MFI[i-1]>20 && stdDev[i-1]<3*aux_abs && body_down>0 && body_down>2*candle_lo && close[i-1]<low[i-2] && open[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1] && close[i-1]<HILO2[i-1]) {
               if (date_candle.hour>15 && high[i-1]<VWAP[i-1]);
-              else aux_dir-=2;
+              else {
+                 aux_dir-=2;
+                 if ((filter.HILO_INVERTSELL || filter.SAR_INVERTSELL || mycounters.c_down>1) && mycounters.hilosell<3 && date_candle.hour>10 && date_candle.hour<15 && close[i-1]<low[i-2] && open[i-1]>MA25[i-1] && close[i-1]<MA25[i-1]) aux_dir-=5;
+              }
            }
            if (CCI[i-1]<-140 && open[i-1]-VWAP[i-1]>2*(VWAP[i-1]-close[i-1]));
            else {
