@@ -48,7 +48,7 @@ if (trade_mode<3) {
        //hHILO = iCustom(NULL, PERIOD_CURRENT, "gann_hi_lo_activator_ssl.ex5", 5, MODE_EMA);
     else
        //hHILO = iCustom(NULL, PERIOD_CURRENT, "gann_hi_lo_activator_ssl.ex5", Default_Period, MODE_SMMA);
-       hHILO = iCustom(NULL, PERIOD_CURRENT, "SSL_Channel_Chart.ex5", MODE_SMMA, Default_Period);
+       hHILO = iCustom(NULL, PERIOD_CURRENT, "SSL_Channel_Chart.ex5", MODE_EMA, Default_Period);
 
     if (hHILO==INVALID_HANDLE) {
        //--- tell about the failure and output the error code
