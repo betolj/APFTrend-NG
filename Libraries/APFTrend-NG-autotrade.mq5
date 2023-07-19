@@ -125,6 +125,19 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
                  if(open[i-2]<VWAP[i-2] && MAFast[i-1]>MA25[i-1] && low[i-2]<MAFast[i-2] && close[i-1]>MAFast[i-1]) aux_dir+=10;
            }
         }
+        if (type==1 && (date_candle.hour>10 || (date_candle.hour==10 && date_candle.min>30)) && i-pricestats.vwap_idx<35) {
+           // Generic Long bollinger or HiLo trade
+           if (filter.NO_VWAP_CROSS && mycounters.c_up<3 && body_up>0 && CCI[i-2]<-110 && CCI[i-1]-CCI[i-2]>30 && open[i-1]<MAFast[i-1] && high[i-1]<VWAP[i-1] && low[i-1]>low[i-2] && low[i-3]>low[i-2] && low[i-2]<loBand[i-2] && open[i-1]>loBand2[i-1]) {
+              if (filter.HILO_SELL && filter.SAR_SELL && (stdDev[i-1]<aux_abs/2 || ATR[i-1]<aux_abs/2));
+              else if (filter.HILO_SELL && (Force[i-1]>1 || (date_candle.hour==16 && date_candle.min>35) || (high[i-1]>HILO[i-1] && close[i-1]<HILO[i-1])));
+              else aux_dir+=14;
+           }
+           else if (vwap_distance<2*aux_abs) {
+              if (filter.tdf_color!=2 && filter.VWAP_UP && filter.MIBAND_UP && filter.HILO_BUY && mycounters.hilobuy<15 && low[i-1]<HILO[i-1] && open[i-1]>HILO[i-1])
+                 if (body_up>0 && close[i-1]>high[i-2] && CCI[i-1]>-35 && CCI[i-1]<100 && MFI[i-1]<90 && open[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && open[i-1]<MA50[i-1] && close[i-1]>MA50[i-1])
+                    aux_dir+=10;
+           }
+        }
      }
      if (pricestats.bars_day>5 && date_candle.hour<16 && aux_abs>aux_abslast) {
         if (VOLUME_UP && filter.NO_VWAPCROSS && i-pricestats.vwap_idx>8) {
@@ -244,6 +257,7 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            if (aux_dir>2 && aux_dir<14 && filter.tdf_color!=1 && filter.NO_VWAPCROSS && i-pricestats.vwap_idx>15 && RSI[i-1]>63 && low[i-1]>VWAP[i-1]) aux_dir=0;
            if (aux_dir>2 && aux_dir<10 && date_candle.hour>15 && filter.NO_VWAPCROSS && force_trade==0 && i-pricestats.vwap_idx>15 && RSI[i-1]>65 && low[i-1]>VWAP[i-1] && high[i-1]>loBand[i-1] && stdDev[i-1]<body_up/1.5) aux_dir--;
            if (aux_dir>2 && aux_dir<13 && date_candle.hour>11 && force_trade==0 && date_candle.hour<14 && filter.VWAP_CROSS && filter.VWAP_LASTCROSS && MAFast[i-1]<MA25[i-1] && !(filter.HILO_BUY && close[i-1]>MAFast[i-1] && close[i-1]>HILO2[i-1])) aux_dir=0;
+           if (aux_dir>2 && aux_dir<10 && date_candle.hour<11 && force_trade==0 && CCI[i-1]>110 && open[i-1]>VWAP[i-1] && open[i-1]>MAFast[i-1] && high[i-1]>=pricestats.max_dayprice && close[i-1]>upBand[i-1] && high[i-1]>upBand2[i-1] && close[i-1]<upBand2[i-1]) aux_dir-=2;
            if (MAFast[i-1]>MA25[i-1] && MA25[i-1]>MA50[i-1] && MA50[i-1]>MA100[i-1]) {
               aux_dir++;
               if (close[i-1]>MAFast[i-1]) aux_dir++;
@@ -373,6 +387,7 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            if (date_candle.hour>12 && filter.HILO_SELL && filter.tdf_color!=1 && filter.NO_VWAPCROSS && filter.VWAP_DOWN && i-pricestats.vwap_idx>10 && body_down>0 && close[i-1]<low[i-2] && close[i-1]<HILO2[i-1] && high[i-2]>upBand[i-2] && high[i-1]<upBand[i-1] && close[i-1]<MAFast[i-1] && VWAP[i-1]<MA200[i-1] && MA200[i-1]<MA200[i-2]) aux_dir-=2;
            if (aux_dir<-2 && aux_dir>-11 && filter.tdf_color!=2 && filter.NO_VWAPCROSS && i-pricestats.vwap_idx>15 && RSI[i-1]<43 && high[i-1]<VWAP[i-1]) aux_dir=0;
            if (aux_dir<-2 && aux_dir>-10 && date_candle.hour>14 && force_trade==0 && i-pricestats.vwap_idx>15 && RSI[i-1]<40 && high[i-1]<VWAP[i-1] && low[i-1]<loBand[i-1] && stdDev[i-1]<body_down/1.5) aux_dir++;
+           if (aux_dir<-2 && aux_dir>-10 && date_candle.hour<11 && force_trade==0 && CCI[i-1]<-200 && open[i-1]<VWAP[i-1] && open[i-1]<MAFast[i-1] && low[i-1]<=pricestats.min_dayprice && close[i-1]<loBand[i-1] && low[i-1]<loBand2[i-1] && close[i-1]>loBand2[i-1]) aux_dir+=2;
            if (aux_dir<-2 && aux_dir>-13 && date_candle.hour>11 && date_candle.hour<14 && force_trade==0 && filter.VWAP_CROSS && filter.VWAP_LASTCROSS && MAFast[i-1]>MA25[i-1] && !(filter.HILO_SELL && close[i-1]<MAFast[i-1] && close[i-1]<HILO2[i-1] && close[i-1]<MA200[i-1] && high[i-2]>MA200[i-2])) aux_dir=0;
            if (MAFast[i-1]<MA25[i-1] && MA25[i-1]<MA50[i-1] && MA50[i-1]<MA100[i-1]) {
               aux_dir--;
