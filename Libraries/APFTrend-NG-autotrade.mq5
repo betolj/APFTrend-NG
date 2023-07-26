@@ -165,6 +165,15 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            }
         }
      }
+     if (type==1 && date_candle.hour>9 && date_candle.hour<16 && i-pricestats.vwap_idx<16 && ATR[i-1]>aux_abs) {
+        if (high[i-1]>MA25[i-1] && low[i-1]<MA25[i-1] && high[i-1]>MA50[i-1] && low[i-1]<MA50[i-1] && high[i-1]>MA100[i-1] && low[i-1]<MA100[i-1] && (filter.VWAP_CROSS || (high[i-1]>MA200[i-1] && low[i-1]<MA200[i-1])));
+        else if (body_up>0 && close[i-1]>open[i-2] && body_up>candle_hi && open[i-1]<VWAP[i-1] && close[i-1]>(high[i-2]+low[i-2])/2 && CCI[i-1]>-15)
+           if (MA25[i-1]>MA50[i-1] && MA50[i-1]>MA100[i-1] && open[i-1]<MA25[i-1] && close[i-1]>MA25[i-1] && open[i-1]<MA50[i-1] && close[i-1]>MA50[i-1]) aux_dir+=10;
+
+        if (low[i-1]>low[i-2] && high[i-1]>MA25[i-1] && low[i-1]<MA25[i-1] && high[i-1]>MA50[i-1] && low[i-1]<MA50[i-1] && high[i-1]>MA100[i-1] && low[i-1]<MA100[i-1]);
+        else if (body_down>0 && body_down>candle_lo && open[i-1]>VWAP[i-1] && close[i-1]<(high[i-2]+low[i-2])/2 && CCI[i-1]<15)
+           if (MA100[i-1]>MA50[i-1] && MA50[i-1]>MA25[i-1] && open[i-1]>MA100[i-1] && close[i-1]<MA100[i-1] && open[i-1]>MA50[i-1] && close[i-1]<MA50[i-1]) aux_dir-=10;
+     }
      if (date_candle.hour==14 && date_candle.min>25) {
         if (i-pricestats.vwap_idx<30) {
            if ((type==1 || filter.tdf_color==1) && filter.HILO_INVERTBUY && body_up>0 && MFI[i-1]>30 && close[i-1]>HILO2[i-1] && high[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1])
