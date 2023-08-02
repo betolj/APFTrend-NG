@@ -190,6 +190,13 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
      }
 
      if (filter.VWAP_CROSS && pricestats.bars_day>6 && date_candle.hour<15) {
+        if (filter.VWAP_LASTCROSS && type==1) {
+           if (mycounters.c_up==1 && CCI[i-2]<-200 && body_up>0 && close[i-1]>(open[i-2]+close[i-2])/2 && low[i-2]<loBand2[i-2] && low[i-3]>VWAP[i-3])
+              if (body_up>3*candle_hi && body_up>2*candle_lo && MA50[i-1]>MA100[i-1] && open[i-2]>MA50[i-2] && close[i-1]>MA50[i-1] && close[i-1]-VWAP[i-1]>(VWAP[i-1]-open[i-1])/2) aux_dir+=14;
+
+           if (mycounters.c_down==1 && CCI[i-2]>200 && body_down>0 && close[i-1]<(open[i-2]+close[i-2])/2 && high[i-2]>upBand2[i-2] && high[i-3]<VWAP[i-3])
+              if (body_down>3*candle_lo && body_down>2*candle_hi && (VOLUME_UP || high[i-1]<high[i-2]) && MA50[i-1]<MA100[i-1] && open[i-2]<MA50[i-2] && close[i-1]<MA50[i-1] && VWAP[i-1]-close[i-1]>(open[i-1]-VWAP[i-1])/2) aux_dir-=14;
+        }
         if (filter.HILO_INVERTBUY && filter.SAR_INVERTBUY && body_up>0 && close[i-1]>high[i-2] && high[i-2]<VWAP[i-2] && open[i-1]<VWAP[i-1] && close[i-1]>VWAP[i-1]) {
            if (MFI[i-1]>50 && RSI[i-1]>40 && RSI[i-1]<80 && open[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && MathMin(open[i-3],close[i-3])>loBand[i-3]) {
               aux_dir+=10;
