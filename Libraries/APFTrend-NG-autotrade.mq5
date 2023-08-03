@@ -40,6 +40,7 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
      double candlelast_lo = MathMin(open[i-1],close[i-1])-low[i-1];
 
      aux_abs=MathAbs(close[i-1]-open[i-1]);
+     aux_abslast=MathAbs(close[i-2]-open[i-2]);
      body_up=close[i-1]-open[i-1];
      body_down=open[i-1]-close[i-1];
      candle_lo=(MathMin(open[i-1],close[i-1])-low[i-1]);
@@ -188,6 +189,22 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            else if (mycounters.c_down==2 && body_down>0 && RSI[i-3]>75 && CCI[i-3]>135 && CCI[i-1]<70 && low[i-1]>VWAP[i-1] && (low[i-1]<HILO[i-1] || low[i-1]<HILO2[i-1]) && high[i-1]-close[i-1]>2*aux_abslast && close[i-1]<low[i-2] && close[i-1]<(open[i-3]+close[i-3])/2 && close[i-3]>upBand2[i-3] && close[i-1]<upBand2[i-1]) aux_dir-=20;
         }
      }
+     if (date_candle.hour<16 && aux_abs>2*candle_hi && aux_abs>2*candle_lo) {
+        if (mycounters.c_up==2 && CCI[i-3]<-110 && RSI[i-1]>45 && low[i-2]<loBand[i-2]) {
+           if (CCI[i-1]-CCI[i-3]>70 && RSI[i-3]<30 && pricestats.max_dayprice-close[i-1]>5*aux_abs)
+              if (open[i-1]<VWAP[i-1] && close[i-1]>high[i-2] && close[i-1]>high[i-3] && open[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && open[i-1]<MA200[i-1] && close[i-1]>MA200[i-1]) aux_dir+=5;
+
+           if (CCI[i-3]<-150 && CCI[i-1]-CCI[i-3]>50 && low[i-1]-low[i-2]>aux_abslast && aux_abs>aux_abslast && aux_abs>3*candle_hi && aux_abs>3*candle_lo)
+              if (open[i-1]<VWAP[i-1] && close[i-1]>VWAP[i-1] && open[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && low[i-2]<loBand2[i-2] && low[i-1]>loBand2[i-1] && close[i-1]>loBand[i-1] && high[i-1]<upBand[i-1]) aux_dir+=12;
+        }
+        else if (mycounters.c_down==2 && CCI[i-3]>110 && high[i-2]>upBand[i-2]) {
+           if (CCI[i-3]-CCI[i-1]>70 && RSI[i-3]>65 && close[i-1]-pricestats.min_dayprice>5*aux_abs)
+              if (open[i-1]>VWAP[i-1] && close[i-1]<low[i-2] && close[i-1]<low[i-3] && open[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1] && open[i-1]>MA200[i-1] && close[i-1]<MA200[i-1]) aux_dir-=5;
+
+           if (date_candle.hour==10 && mycounters.c_down==2 && CCI[i-3]>150 && CCI[i-3]-CCI[i-1]>50 && RSI[i-1]<55 && high[i-2]-high[i-1]>aux_abslast && aux_abs>aux_abslast && aux_abs>3*candle_hi && aux_abs>3*candle_lo)
+              if (open[i-1]>VWAP[i-1] && close[i-1]<VWAP[i-1] && open[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1] && high[i-2]>upBand2[i-2] && high[i-1]<upBand2[i-1] && close[i-1]<upBand[i-1] && low[i-1]>loBand[i-1]) aux_dir-=12;
+        }
+     }
 
      if (filter.VWAP_CROSS && pricestats.bars_day>6 && date_candle.hour<15) {
         if (filter.VWAP_LASTCROSS && type==1) {
@@ -208,6 +225,15 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
               aux_dir-=10;
               force_trade=1;
            }
+        }
+        if (type==0 && aux_abs>aux_abslast) {
+           if (mycounters.c_up==2 && Force[i-1]>0 && CCI[i-2]<-150 && low[i-2]<=pricestats.min_dayprice && close[i-2]<loBand[i-2])
+              if (CCI[i-1]-CCI[i-2]>30 && close[i-1]>(high[i-2]+low[i-2])/2 && high[i-2]<VWAP[i-2] && open[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1])
+                 aux_dir+=6;
+
+           if (mycounters.c_down==2 && Force[i-1]<0 && CCI[i-2]>150 && high[i-2]>=pricestats.max_dayprice && close[i-2]>upBand[i-2])
+              if (CCI[i-2]-CCI[i-1]>30 && close[i-1]<(high[i-2]+low[i-2])/2 && low[i-2]>VWAP[i-2] && open[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1])
+                 aux_dir-=6;
         }
      }
 
