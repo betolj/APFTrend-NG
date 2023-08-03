@@ -201,7 +201,7 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            if (CCI[i-3]-CCI[i-1]>70 && RSI[i-3]>65 && close[i-1]-pricestats.min_dayprice>5*aux_abs)
               if (open[i-1]>VWAP[i-1] && close[i-1]<low[i-2] && close[i-1]<low[i-3] && open[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1] && open[i-1]>MA200[i-1] && close[i-1]<MA200[i-1]) aux_dir-=5;
 
-           if (date_candle.hour==10 && mycounters.c_down==2 && CCI[i-3]>150 && CCI[i-3]-CCI[i-1]>50 && RSI[i-1]<55 && high[i-2]-high[i-1]>aux_abslast && aux_abs>aux_abslast && aux_abs>3*candle_hi && aux_abs>3*candle_lo)
+           if (mycounters.c_down==2 && CCI[i-3]>150 && CCI[i-3]-CCI[i-1]>50 && RSI[i-1]<55 && high[i-2]-high[i-1]>aux_abslast && aux_abs>aux_abslast && aux_abs>3*candle_hi && aux_abs>3*candle_lo)
               if (open[i-1]>VWAP[i-1] && close[i-1]<VWAP[i-1] && open[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1] && high[i-2]>upBand2[i-2] && high[i-1]<upBand2[i-1] && close[i-1]<upBand[i-1] && low[i-1]>loBand[i-1]) aux_dir-=12;
         }
      }
