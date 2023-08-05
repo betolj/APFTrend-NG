@@ -539,6 +539,18 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
         if (body_down>0 && body_down>2*candle_lo && MFI[i-2]>90)
            if (low[i-1]<low[i-2] && high[i-2]-high[i-1]>body_down && high[i-2]-high[i-3]>body_down && high[i-2]>upBand2[i-2] && open[i-1]<upBand2[i-1])
               aux_dir-=15;
+
+        if (type==1) {
+           if (aux_dir>2) {
+              if ((filter.HILO_SELL || filter.SAR_SELL) && filter.tdf_color==0 && i-pricestats.vwap_idx>30 && stdDev[i-1]<aux_abs/2 && high[i-1]<high[i-3] && date_candle.hour>13) aux_dir=0;
+              if (aux_dir>2 && filter.NO_VWAPCROSS && (filter.VWAP_DOWN || VWAP[i-1]<VWAP[i-2]) && i-pricestats.vwap_idx>30 && CCI[i-1]>140 && high[i-1]<VWAP[i-1] && close[i-1]<MA50[i-1] && ((high[i-1]>MA50[i-1] && close[i-1]<MA50[i-1]) || (high[i-1]>MA100[i-1] && close[i-1]<MA100[i-1]))) aux_dir=0;
+           }
+           else if (aux_dir<-2) {
+              if ((filter.HILO_BUY || filter.SAR_BUY) && filter.tdf_color==0 && i-pricestats.vwap_idx>30 && stdDev[i-1]<aux_abs/2 && low[i-1]>low[i-3] && date_candle.hour>13) aux_dir=0;
+              if (aux_dir<-2 && filter.NO_VWAPCROSS && (filter.VWAP_UP || VWAP[i-1]>VWAP[i-2]) && i-pricestats.vwap_idx>30 && RSI[i-1]<32 && CCI[i-1]<-140 && low[i-1]>VWAP[i-1] && close[i-1]>MA50[i-1] && ((low[i-1]<MA50[i-1] && close[i-1]>MA50[i-1]) || (low[i-1]<MA100[i-1] && close[i-1]>MA100[i-1]))) aux_dir=0;
+           }
+                      
+        }
      }
 
      if (force_trade==0) {
@@ -576,11 +588,14 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
               if (aux_dir>2 && aux_dir<14 && date_candle.hour<11 && CCI[i-1]>90 && candle_hi>0 && high[i-1]>upBand[i-1] && (low[i-1]<loBand[i-1] || low[i-2]<loBand[i-2]) && MA100[i-1]>MA50[i-1] && MA50[i-1]>MA25[i-1] && high[i-1]>MA100[i-1] && low[i-1]<MA25[i-1]) aux_dir=0;
               if (aux_dir>2 && aux_dir<14 && date_candle.hour>15 && CCI[i-1]>120 && MFI[i-1]>90 && RSI[i-1]>70 && low[i-1]>VWAP[i-1]) aux_dir-=2;
               if (aux_dir>2 && aux_dir<14 && filter.tdf_color==0 && mycounters.hilobuy>5 && CCI[i-1]>68 && CCI[i-1]-CCI[i-2]<1 && close[i-1]<high[i-2] && candle_hi>0 && low[i-1]>VWAP[i-1] && (tick_volume[i-1]<tick_volume[i-2] || tick_volume[i-1]<tick_volume[i-3])) aux_dir-=2;
+              if (aux_dir>2 && aux_dir<14 && date_candle.hour>12 && filter.NO_VWAPCROSS && CCI[i-1]>90 && stdDev[i-1]<aux_abs/2 && i-pricestats.vwap_idx>15 && high[i-1]<VWAP[i-1] && MA200[i-1]>MA100[i-1] && MA100[i-1]-MA50[i-1]>aux_abs && MA50[i-1]-MA25[i-1]>aux_abs/2) aux_dir=0;
+              if (aux_dir>2 && filter.VWAP_CROSS && filter.VWAP_LASTCROSS && mycounters.c_up==1 && stdDev[i-1]<aux_abs/2 && ((high[i-1]>upBand2[i-1] && high[i-2]>upBand2[i-2]) || (high[i-1]>upBand[i-1] && high[i-2]>upBand[i-2] && MA200[i-1]<MA200[i-2]))) aux_dir=0;
               if (aux_dir>2 && filter.VWAP_CROSS && filter.VWAP_LASTCROSS && MA200[i-1]>MA100[i-1] && MA100[i-1]>MA50[i-1] && MA50[i-1]>MA25[i-1] && high[i-1]>MA50[i-1] && close[i-1]<MA50[i-1] && high[i-1]>upBand[i-1] && MA200[i-1]<MA200[i-2] && MA100[i-1]<MA100[i-2]) aux_dir=0;
               if (aux_dir>2 && VWAP_CROSS && force_trade==0 && high[i-2]<VWAP[i-2] && CCI[i-1]>150 && close[i-1]>upBand[i-1] && low[i-2]<loBand2[i-2] && close[i-1]>MAFast[i-1]) aux_dir=0;
-              if (force_trade==0 && filter.tdf_color==0) {
+              if (force_trade==0 && filter.tdf_color==0) {  
                  if (aux_dir>2 && filter.VWAP_CROSS && pricestats.bars_day<6 && high[i-1]>MA200[i-1] && close[i-1]<MA200[i-1]) aux_dir=0;
                  if (aux_dir>2 && filter.VWAP_LASTCROSS && filter.HILO_INVERTBUY && CCI[i-1]>150 && candle_hi>0 && open[i-1]>MAFast[i-1] && high[i-3]<VWAP[i-3] && aux_abs<aux_abslast/2 && MathAbs(close[i-3]-open[i-3])<aux_abslast/2) aux_dir=0;
+                 if (aux_dir>2 && filter.NO_VWAPCROSS && filter.VWAP_DOWN && i-pricestats.vwap_idx>30 && CCI[i-1]>120 && high[i-1]<VWAP[i-1] && close[i-1]<MA50[i-1] && ((high[i-1]>MA50[i-1] && close[i-1]<MA50[i-1]) || (high[i-1]>MA100[i-1] && close[i-1]<MA100[i-1]))) aux_dir-=2;
                  if (aux_dir>2 && filter.NO_VWAPCROSS && filter.VWAP_DOWN && filter.MIBAND_DOWN && CCI[i-1]>95 && candle_hi>0 && stdDev[i-1]<aux_abs/2 && i-pricestats.vwap_idx>20 && high[i-1]<VWAP[i-1] && MA50[i-1]<VWAP[i-1] && MA100[i-1]-MA50[i-1]>aux_abs && MA50[i-1]-MA25[i-1]>aux_abs/2 && MA100[i-1]<MA100[i-2]) aux_dir=0;
                  if (aux_dir>2 && filter.NO_VWAPCROSS && filter.HILO_INVERTBUY && date_candle.hour==13 && CCI[i-1]>100 && MFI[i-1]>71 && candle_hi>0 && high[i-1]<VWAP[i-1] && VWAP[i-1]-high[i-1]<body_up/2) aux_dir=0;
                  if (aux_dir>2 && filter.NO_VWAPCROSS && filter.HILO_INVERTBUY && date_candle.hour==13 && mycounters.c_up==1 && i-pricestats.vwap_idx>30 && CCI[i-1]>170 && candle_hi>0 && low[i-1]>VWAP[i-1]) aux_dir=0;
@@ -599,11 +614,14 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
               if (aux_dir<-5 && aux_dir>-14 && date_candle.hour==10 && force_trade==0 && open[i-1]>VWAP[i-1] && VWAP[i-1]-close[i-1]>2*(open[i-1]-VWAP[i-1]) && (close[i-1]<MA25[i-1] || close[i-1]<MA100[i-1]) && low[i-1]>MA50[i-1]) aux_dir=0;
               if (aux_dir<-2 && aux_dir>-14 && date_candle.hour>15 && CCI[i-1]<-120 && MFI[i-1]<20 && RSI[i-1]<35 && high[i-1]<VWAP[i-1]) aux_dir+=2;
               if (aux_dir<-2 && aux_dir>-14 && filter.tdf_color==0 && mycounters.hilosell>5 && CCI[i-1]<-70 && CCI[i-2]-CCI[i-1]<1 && close[i-1]>low[i-2] && candle_lo>0 && high[i-1]<VWAP[i-1] && (tick_volume[i-1]<tick_volume[i-2] || tick_volume[i-1]<tick_volume[i-3])) aux_dir+=2;
+              if (aux_dir<-2 && aux_dir>-14 && date_candle.hour>12 && filter.NO_VWAPCROSS && CCI[i-1]<-90 && stdDev[i-1]<aux_abs/2 && i-pricestats.vwap_idx>15 && high[i-1]<VWAP[i-1] && MA200[i-1]<MA100[i-1] && MA50[i-1]-MA100[i-1]>aux_abs && MA25[i-1]-MA50[i-1]>aux_abs/2) aux_dir=0;
+              if (aux_dir<-2 && filter.VWAP_CROSS && filter.VWAP_LASTCROSS && mycounters.c_down==1 && stdDev[i-1]<aux_abs/2 && low[i-1]<loBand2[i-1] && low[i-2]<loBand2[i-2]) aux_dir=0;
               if (aux_dir<-2 && filter.VWAP_CROSS && filter.VWAP_LASTCROSS && aux_dir>-14 && MA25[i-1]>MA50[i-1] && MA50[i-1]>MA100[i-1] && MA100[i-1]>MA200[i-1] && low[i-1]<MA50[i-1] && close[i-1]>MA50[i-1] && low[i-1]<loBand[i-1] && MA200[i-1]>MA200[i-2] && MA100[i-1]>MA100[i-2]) aux_dir=0;
               if (aux_dir<-2 && VWAP_CROSS && force_trade==0 && low[i-2]>VWAP[i-2] && CCI[i-1]<-150 && close[i-1]<loBand[i-1] && high[i-2]>upBand[i-2] && high[i-3]>upBand[i-3] && close[i-1]<MAFast[i-1]) aux_dir=0;
               if (force_trade==0 && filter.tdf_color==0) {
                  if (aux_dir<-2 && filter.VWAP_CROSS && pricestats.bars_day<6 && low[i-1]<MA200[i-1] && close[i-1]>MA200[i-1]) aux_dir=0;
                  if (aux_dir<-2 && filter.VWAP_LASTCROSS && filter.HILO_INVERTSELL && CCI[i-1]<-60 && candle_lo>0 && open[i-1]<MAFast[i-1] && low[i-3]>VWAP[i-3] && aux_abs<aux_abslast/2 && MathAbs(close[i-3]-open[i-3])<aux_abslast/2) aux_dir=0;
+                 if (aux_dir<-2 && filter.NO_VWAPCROSS && filter.VWAP_UP && i-pricestats.vwap_idx>30 && CCI[i-1]<-150 && low[i-1]>VWAP[i-1] && low[i-1]>MA50[i-1] && ((low[i-1]<MA50[i-1] && close[i-1]>MA50[i-1]) || (low[i-1]<MA100[i-1] && close[i-1]>MA100[i-1]))) aux_dir+=2;
                  if (aux_dir<-2 && filter.NO_VWAPCROSS && filter.VWAP_UP && filter.MIBAND_UP && CCI[i-1]<-200 && candle_lo>0 && stdDev[i-1]<aux_abs/2 && i-pricestats.vwap_idx>20 && low[i-1]>VWAP[i-1] && MA50[i-1]>VWAP[i-1] && MA50[i-1]-MA100[i-1]>aux_abs && MA25[i-1]-MA50[i-1]>aux_abs/2 && MA100[i-1]>MA100[i-2]) aux_dir=0;
                  if (aux_dir<-2 && filter.NO_VWAPCROSS && filter.HILO_INVERTSELL && date_candle.hour==13 && CCI[i-1]<-100 && MFI[i-1]<15 && candle_lo>0 && low[i-1]>VWAP[i-1] && low[i-1]-VWAP[i-1]<body_down/2) aux_dir=0;
                  if (aux_dir<-2 && filter.NO_VWAPCROSS && filter.HILO_INVERTSELL && date_candle.hour==13 && mycounters.c_down==1 && i-pricestats.vwap_idx>30 && CCI[i-1]<-170 && candle_lo>0 && high[i-1]<VWAP[i-1]) aux_dir=0;
@@ -617,15 +635,21 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
      if (date_candle.hour>10 && date_candle.hour<15) {
         if (type==0) {
            // Close position
-           if (apftrade.trade_dir==1 && filter.tdf_color!=1) {
-              if (filter.HILO_INVERTSELL && mycounters.c_down>1 && CCI[i-1]<30 && MFI[i-1]<90 && RSI[i-1]<58) 
-                 if (body_down>0 && close[i-1]<HILO2[i-1])
-                    aux_dir-=5;
+           if (apftrade.trade_dir==1) {
+              if (filter.tdf_color!=1) {
+                 if (filter.HILO_INVERTSELL && mycounters.c_down>1 && CCI[i-1]<30 && MFI[i-1]<90 && RSI[i-1]<58) 
+                    if (body_down>0 && close[i-1]<HILO2[i-1])
+                       aux_dir-=5;
+              }
+              if (CCI[i-2]>120 && RSI[i-2]>70 && body_down>3*candle_lo && close[i-1]<low[i-2] && ((close[i-3]<MA100[i-3] && close[i-2]>MA100[i-2] && close[i-1]>VWAP[i-1]) || (close[i-3]<MA200[i-3] && close[i-2]>MA200[i-2])) && close[i-1]<MA50[i-1] && high[i-2]>upBand[i-2] && close[i-1]<upBand[i-1]) aux_dir=-5;
            }
            else if (apftrade.trade_dir==2 && filter.tdf_color!=2) {
-              if (filter.HILO_INVERTBUY && mycounters.c_up>1 && CCI[i-1]>-30 && MFI[i-1]>20 && RSI[i-1]>28) 
-                 if (body_up>0 && close[i-1]>HILO2[i-1])
-                    aux_dir+=5;
+              if (filter.tdf_color!=2) {
+                 if (filter.HILO_INVERTBUY && mycounters.c_up>1 && CCI[i-1]>-30 && MFI[i-1]>20 && RSI[i-1]>28) 
+                    if (body_up>0 && close[i-1]>HILO2[i-1])
+                       aux_dir+=5;
+              }
+              if (CCI[i-2]<-120 && RSI[i-2]<30 && body_up>3*candle_hi && close[i-1]>high[i-2] && ((close[i-3]>MA100[i-3] && close[i-2]<MA100[i-2] && close[i-1]<VWAP[i-1]) || (close[i-3]>MA200[i-3] && close[i-2]<MA200[i-2])) && close[i-1]>MA50[i-1] && low[i-2]<loBand[i-2] && close[i-1]>loBand[i-1]) aux_dir=5;
            }
         }
 
