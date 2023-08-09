@@ -261,7 +261,14 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
         if (close[i-1]>MAFast[i-1]) aux_dir++;
         else if (close[i-1]<MAFast[i-1]) aux_dir--;
 
-        if (filter.VWAP_CROSS && filter.VWAP_LASTCROSS && pricestats.bars_day>5 && date_candle.hour<16) {
+        if (filter.NO_VWAPCROSS && i-pricestats.vwap_idx>2 && i-pricestats.vwap_idx<6) {
+           if (mycounters.c_up==2 && CCI[i-3]<-150 && low[i-3]>loBand2[i-3] && close[i-1]>high[i-2] && close[i-1]>HILO2[i-1] && MAFast[i-1]-high[i-1]>aux_abs)
+              aux_dir+=15;
+      
+           if (mycounters.c_down==2 && CCI[i-3]>150 && high[i-3]>upBand[i-3] && close[i-1]<low[i-2] && close[i-1]<HILO2[i-1] && low[i-1]-MAFast[i-1]>aux_abs)
+              aux_dir-=15;
+        }
+        else if (filter.VWAP_CROSS && filter.VWAP_LASTCROSS && pricestats.bars_day>5 && date_candle.hour<16) {
            if (filter.HILO_BUY && CCI[i-1]<150 && CCI[i-1]>-50 && MFI[i-1]<90 && body_up>2*candle_hi && close[i-1]>(open[i-2]+close[i-2])/2) {
               if (Force[i-1]>0 && low[i-3]>VWAP[i-3] && close[i-1]>VWAP[i-1] && open[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && close[i-1]<upBand2[i-1]) {
                  aux_dir+=10;
