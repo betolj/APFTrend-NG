@@ -268,30 +268,40 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            if (mycounters.c_down==2 && CCI[i-3]>150 && high[i-3]>upBand[i-3] && close[i-1]<low[i-2] && close[i-1]<HILO2[i-1] && low[i-1]-MAFast[i-1]>aux_abs)
               aux_dir-=15;
         }
-        else if (filter.VWAP_CROSS && filter.VWAP_LASTCROSS && pricestats.bars_day>5 && date_candle.hour<16) {
-           if (filter.HILO_BUY && CCI[i-1]<150 && CCI[i-1]>-50 && MFI[i-1]<90 && body_up>2*candle_hi && close[i-1]>(open[i-2]+close[i-2])/2) {
-              if (Force[i-1]>0 && low[i-3]>VWAP[i-3] && close[i-1]>VWAP[i-1] && open[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && close[i-1]<upBand2[i-1]) {
-                 aux_dir+=10;
-                 force_trade=1;
-              }
+        else if (filter.VWAP_CROSS) {
+           if (date_candle.hour<16) {
+              if (mycounters.c_up==2 && filter.HILO_BUY && filter.tdf_color==1 && CCI[i-1]<150 && MFI[i-1]<95 && pricestats.max_lastdayprice-high[i-1]>3*aux_abs)
+                 if (close[i-1]>high[i-2] && body_up>2*candle_hi && MAFast[i-1]>MA25[i-1] && open[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && open[i-1]<MA50[i-1] && close[i-1]>MA50[i-1]) aux_dir+=10;
+   
+              if (mycounters.c_down==2 && filter.HILO_SELL && filter.tdf_color==2 && CCI[i-1]>-150 && MFI[i-1]>10 && low[i-1]-pricestats.min_lastdayprice>3*aux_abs)
+                 if (close[i-1]<low[i-2] && body_down>2*candle_lo && MAFast[i-1]<MA25[i-1] && open[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1] && open[i-1]>MA50[i-1] && close[i-1]<MA50[i-1]) aux_dir-=10;
            }
-           else if (filter.HILO_SELL && CCI[i-1]>-150 && CCI[i-1]<50 && MFI[i-1]>20 && body_down>2*candle_lo && close[i-1]<(open[i-2]+close[i-2])/2) {
-              if (Force[i-1]<0 && high[i-3]<VWAP[i-3] && close[i-1]<VWAP[i-1] && open[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1] && close[i-1]>loBand2[i-1]) {
-                 aux_dir-=10;
-                 force_trade=1;
-              }
-           }
-           if ((date_candle.min==15 || date_candle.min==30) && stdDev[i-1]<3*aux_abs && aux_abs>candle_hi && aux_abs>candle_lo) {
-              if (mycounters.c_up==1 && filter.tdf_color!=2 && CCI[i-1]>-110 && CCI[i-2]<-150 && body_up>candle_hi && close[i-1]>(open[i-2]+close[i-2])/2) {
-                 if (candle_hi<aux_abslast && CCI[i-1]-CCI[i-2]>100 && low[i-1]<loBand2[i-1] && close[i-1]<upBand[i-1] && MAFast[i-1]-close[i-1]<candle_hi) {
-                    aux_dir+=12;
+
+           if (filter.VWAP_LASTCROSS && pricestats.bars_day>5 && date_candle.hour<16) {
+              if (filter.HILO_BUY && CCI[i-1]<150 && CCI[i-1]>-50 && MFI[i-1]<90 && body_up>2*candle_hi && close[i-1]>(open[i-2]+close[i-2])/2) {
+                 if (Force[i-1]>0 && low[i-3]>VWAP[i-3] && close[i-1]>VWAP[i-1] && open[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && close[i-1]<upBand2[i-1]) {
+                    aux_dir+=10;
                     force_trade=1;
                  }
               }
-              if (mycounters.c_down==1 && filter.tdf_color!=1 && CCI[i-1]<110 && CCI[i-2]>150 && body_down>candle_lo && close[i-1]<(open[i-2]+close[i-2])/2) {
-                 if (candle_lo<aux_abslast && CCI[i-2]-CCI[i-1]>100 && high[i-1]>upBand2[i-1] && close[i-1]>loBand[i-1] && close[i-1]-MAFast[i-1]<candle_lo) {
-                    aux_dir-=12;
+              else if (filter.HILO_SELL && CCI[i-1]>-150 && CCI[i-1]<50 && MFI[i-1]>20 && body_down>2*candle_lo && close[i-1]<(open[i-2]+close[i-2])/2) {
+                 if (Force[i-1]<0 && high[i-3]<VWAP[i-3] && close[i-1]<VWAP[i-1] && open[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1] && close[i-1]>loBand2[i-1]) {
+                    aux_dir-=10;
                     force_trade=1;
+                 }
+              }
+              if ((date_candle.min==15 || date_candle.min==30) && stdDev[i-1]<3*aux_abs && aux_abs>candle_hi && aux_abs>candle_lo) {
+                 if (mycounters.c_up==1 && filter.tdf_color!=2 && CCI[i-1]>-110 && CCI[i-2]<-150 && body_up>candle_hi && close[i-1]>(open[i-2]+close[i-2])/2) {
+                    if (candle_hi<aux_abslast && CCI[i-1]-CCI[i-2]>100 && low[i-1]<loBand2[i-1] && close[i-1]<upBand[i-1] && MAFast[i-1]-close[i-1]<candle_hi) {
+                       aux_dir+=12;
+                       force_trade=1;
+                    }
+                 }
+                 if (mycounters.c_down==1 && filter.tdf_color!=1 && CCI[i-1]<110 && CCI[i-2]>150 && body_down>candle_lo && close[i-1]<(open[i-2]+close[i-2])/2) {
+                    if (candle_lo<aux_abslast && CCI[i-2]-CCI[i-1]>100 && high[i-1]>upBand2[i-1] && close[i-1]>loBand[i-1] && close[i-1]-MAFast[i-1]<candle_lo) {
+                       aux_dir-=12;
+                       force_trade=1;
+                    }
                  }
               }
            }
@@ -509,13 +519,16 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
 
      // Close positions
      if (type==0) {
-        if (apftrade.trade_dir==1) {
+        if (apftrade.trade_dir==1) {   
            if (filter.HILO_INVERTSELL) {
               if ((filter.VWAP_CROSS || filter.VWAP_LASTCROSS) && CCI[i-1]<0 && close[i-1]<MAFast[i-1] && MA50[i-1]<VWAP[i-1] && ((open[i-1]>MA25[i-1] && close[i-1]<MA25[i-1]) || (open[i-1]>MA50[i-1] && close[i-1]<MA50[i-1]))) aux_dir--;
               if (close[i-1]<apftrade.trade_open && close[i-1]<MAFast[i-1]) aux_dir=-5;
               else aux_dir-=3;
            }
            if (filter.tdf_color!=1) {
+              if (mycounters.c_down==2 && filter.HILO_SELL && Force[i-1]<0 && CCI[i-1]<-70 && filter.tdf_color==2 && MFI[i-1]<50)
+                 if (close[i-1]<low[i-2] && MAFast[i-1]<MA25[i-1] && open[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1] && open[i-1]>MA50[i-1] && close[i-1]<MA50[i-1]) aux_dir=-5;
+
               if (filter.HILO_SELL && filter.VWAP_DOWN && close[i-1]<VWAP[i-1] && CCI[i-1]<50 && close[i-1]<HILO2[i-1] && close[i-1]<low[i-2] && open[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1] && close[i-1]<MA25[i-1]) aux_dir-=5;
               if (filter.HILO_INVERTSELL && mycounters.c_down>1 && CCI[id]<30 && MFI[id]<90 && RSI[id]<58) 
                  if (body_down>0 && close[id]<HILO2[id])
@@ -538,6 +551,9 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
               else aux_dir+=3;
            }
            if (filter.tdf_color!=2) {
+              if (mycounters.c_up==2 && filter.HILO_BUY && Force[i-1]>0 && CCI[i-1]>70 && filter.tdf_color==1 && MFI[i-1]>50)
+                 if (close[i-1]>high[i-2] && MAFast[i-1]>MA25[i-1] && open[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && open[i-1]<MA50[i-1] && close[i-1]>MA50[i-1]) aux_dir=5;
+
               if (filter.HILO_BUY && filter.VWAP_UP && close[i-1]>VWAP[i-1] && CCI[i-1]>-50 && close[i-1]>HILO2[i-1] && close[i-1]>high[i-2] && open[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && close[i-1]>MA25[i-1]) aux_dir+=5;
               if (filter.HILO_INVERTBUY && mycounters.c_up>1 && CCI[id]>-30 && MFI[id]>20 && RSI[id]>28) 
                  if (body_up>0 && close[id]>HILO2[id])
