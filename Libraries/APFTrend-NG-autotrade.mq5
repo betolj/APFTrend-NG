@@ -508,6 +508,8 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
               }
            }
         }
+        if (aux_dir>3 && filter.tdf_color!=1 && filter.VWAP_CROSS && filter.VWAP_LASTCROSS && CCI[i-1]<50 && aux_abs<aux_abslast && open[i-1]>VWAP[i-1]) aux_dir=0;
+        else if (aux_dir<-3 && filter.tdf_color!=2 && filter.VWAP_CROSS && filter.VWAP_LASTCROSS && CCI[i-1]>-50 && aux_abs<aux_abslast && open[i-1]<VWAP[i-1]) aux_dir=0;
      }
      if (date_candle.hour>10 && date_candle.hour<15) {
         if (filter.MED_DOWN && ((type==0 && apftrade.trade_dir==1) || (type==1 && body_down>0 && body_down>2*candle_lo && body_down>2*candle_hi)))
