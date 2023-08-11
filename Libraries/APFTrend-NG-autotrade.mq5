@@ -440,6 +440,7 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
               if (force_trade==0 && filter.tdf_color==0) {
                  if (aux_dir>2 && filter.VWAP_LASTCROSS && filter.HILO_INVERTBUY && CCI[id]>150 && candle_hi>0 && open[id]>MAFast[id] && high[id-2]<VWAP[id-2] && aux_abs<aux_abslast/2 && MathAbs(close[id-2]-open[id-2])<aux_abslast/2) aux_dir=0;
                  if (filter.NO_VWAPCROSS) {
+                    if (aux_dir>2 && (filter.HILO_SELL || filter.tdf_color==2) && MAFast[i-1]<MA25[i-1] && high[i-1]>MAFast[i-1] && close[i-1]<MAFast[i-1] && high[i-1]>MA50[i-1] && close[i-1]<MA50[i-1]) aux_dir--;
                     if (aux_dir>2 && date_candle.hour>14 && filter.VWAP_DOWN && MA25[id]<VWAP[id] && i-pricestats.vwap_idx>30 && CCI[id]>110 && high[id]<VWAP[id] && MA50[id]<MA100[id]) aux_dir=0;
                     if (aux_dir>2 && date_candle.hour>11 && i-pricestats.vwap_idx>30 && CCI[id]>110 && candle_hi>0 && candle_lo>0 && (Force[id]<0 || MA100[id]>VWAP[id]) && ((high[id]>MA50[id] && low[id]<MA50[id]) || (high[id]>MA25[id] && low[id]<MA25[id]))) aux_dir=0;
                     if (aux_dir>2 && filter.VWAP_DOWN && i-pricestats.vwap_idx>30 && CCI[id]>120 && high[id]<VWAP[id] && close[id]<MA50[id] && ((high[id]>MA50[id] && close[id]<MA50[id]) || (high[id]>MA100[id] && close[id]<MA100[id]))) aux_dir-=2;
@@ -477,6 +478,7 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
               if (force_trade==0 && filter.tdf_color==0) {
                  if (aux_dir<-2 && filter.VWAP_LASTCROSS && filter.HILO_INVERTSELL && CCI[id]<-60 && candle_lo>0 && open[id]<MAFast[id] && low[id-2]>VWAP[id-2] && aux_abs<aux_abslast/2 && MathAbs(close[id-2]-open[id-2])<aux_abslast/2) aux_dir=0;
                  if (filter.NO_VWAPCROSS) {
+                    if (aux_dir<-2 && (filter.HILO_BUY || filter.tdf_color==1) && force_trade==0 && MAFast[i-1]>MA25[i-1] && low[i-1]<MAFast[i-1] && close[i-1]>MAFast[i-1] && low[i-1]<MA50[i-1] && close[i-1]>MA50[i-1]) aux_dir=0;
                     if (aux_dir<-2 && date_candle.hour>14 && filter.VWAP_UP && MA100[id]>VWAP[id] && i-pricestats.vwap_idx>30 && CCI[id]<-110 && low[id]>VWAP[id] && MA50[id]>MA100[id]) aux_dir=0;
                     if (aux_dir<-2 && date_candle.hour>11 && i-pricestats.vwap_idx>30 && CCI[id]<-110 && candle_hi>0 && candle_lo>0 && (Force[id]>0 || MA25[id]<VWAP[id]) && ((high[id]>MA50[id] && low[id]<MA50[id]) || (high[id]>MA25[id] && low[id]<MA25[id]))) aux_dir=0;
                     if (aux_dir<-2 && filter.VWAP_UP && i-pricestats.vwap_idx>30 && CCI[id]<-150 && low[id]>VWAP[id] && low[id]>MA50[id] && ((low[id]<MA50[id] && close[id]>MA50[id]) || (low[id]<MA100[id] && close[id]>MA100[id]))) aux_dir+=2;
@@ -496,7 +498,9 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
         if (VWAP_CROSS) {
            if (date_candle.hour<15) {
               //if (filter.tdf_color!=2 && mycounters.c_up<3 && pricestats.bars_day>5 && close[id]>VWAP[id] && CCI[i-1]<150 && open[id]<MA50[id] && close[id]>MA50[id] && high[id]<upBand[id] && aux_abs>3*candle_lo && aux_abs>3*candle_hi) aux_dir+=10;
-              if (filter.tdf_color!=1 && close[id]<VWAP[id] && CCI[i-1]>-150 && open[id]>MA50[id] && close[id]<MA50[id] && low[id]>loBand2[id] && aux_abs>3*candle_lo && aux_abs>3*candle_hi) aux_dir-=10;
+              if (filter.tdf_color!=1 && close[id]<VWAP[id] && CCI[id]>-150 && open[id]>MA50[id] && close[id]<MA50[id] && low[id]>loBand2[id] && aux_abs>3*candle_lo && aux_abs>3*candle_hi) aux_dir-=10;
+              if (filter.HILO_INVERTBUY && body_up>3*candle_hi && CCI[id]<110 && MFI[id]<90 && high[id-1]<VWAP[id-1] && close[id]>VWAP[id] && date_candle.hour>9 && open[id]<MA25[id] && close[id]>MA50[id] && close[id]>MA100[id] && close[id]<MA200[id] && open[id]<MAFast[id] && close[id]>MAFast[id]) aux_dir+=10;
+              else if (filter.HILO_INVERTSELL && body_down>3*candle_lo && CCI[id]>-110 && MFI[id]>15 && low[id-1]>VWAP[id-1] && close[id]<VWAP[id] && date_candle.hour>9 && open[id]>MA25[id] && close[id]<MA50[id] && close[id]<MA100[id] && close[id]>MA200[id] && open[id]>MAFast[id] && close[id]<MAFast[id]) aux_dir-=10;
            }
            if (filter.VWAP_UP && body_up>0 && CCI[id]<150 && low[id]>low[id-1] && low[id-2]>low[id-1] && MA25[id]>VWAP[id] && close[id]>(open[id-1]+close[id-1])/2 && low[id-2]>VWAP[id-2] && high[id]<upBand2[id]) {
               if ((low[id-2]>MA100[id-2] && low[id-1]<MA100[id-1] && close[id-1]>MA100[id-1]) || (low[id-2]>MA200[id-2] && low[id-1]<MA200[id-1] && close[id-1]>MA200[id-1]))
