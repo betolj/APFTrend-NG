@@ -354,6 +354,7 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            if (aux_dir>3 && filter.HILO_INVERTBUY) {
               if (filter.VWAP_CROSS && (low[i-1]<MA25[i-1] || low[i-1]<MA100[i-1]) && high[i-1]>MA50[i-1] && close[i-1]<MA50[i-1] && high[i-1]>=pricestats.max_dayprice) aux_dir=0;
               if (aux_dir>3 && filter.VWAP_CROSS && ((high[i-1]>MA25[i-1] && close[i-1]<MA25[i-1]) || (high[i-1]>MA100[i-1] && close[i-1]<MA100[i-1]))) aux_dir--;
+              if (aux_dir>3 && filter.VWAP_CROSS && (date_candle.day_of_week==1 || date_candle.day_of_week==5) && filter.VWAP_DOWN && filter.HILO_INVERTBUY && filter.MIBAND_DOWN && filter.tdf_color!=1 && ((high[i-1]>MA100[i-1] && low[i-1]<MA100[i-1]) || (high[i-1]>MA200[i-1] && low[i-1]<MA200[i-1])) && close[i-1]>MAFast[i-1] && MA25[i-1]<MA50[i-1] && MA50[i-1]<MA50[i-2] && MA100[i-1]<MA100[i-2] && VWAP[i-1]-open[i-1]>3*(close[i-1]-VWAP[i-1])) aux_dir-=3;
               if (aux_dir>3 && CCI[i-1]>190 && i-pricestats.vwap_idx>6 && low[i-1]>VWAP[i-1]) aux_dir-=2;
               if (aux_dir>3 && date_candle.hour<11 && mycounters.c_up>2 && stdDev[i-1]>3*MathAbs(CCI[i-1]) && CCI[i-1]>100 && high[i-1]>upBand[i-1]) aux_dir=0;
               if (aux_dir>3 && date_candle.hour<12 && mycounters.c_up>2 && pricestats.hilo_count>2 && candle_hi>0 && low[i-1]>VWAP[i-1] && close[i-1]>HILO[i-2] && high[i-1]>upBand2[i-1] && open[i-1]>MA25[i-1]) aux_dir=0;
@@ -373,6 +374,7 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
            if (aux_dir<-3 && filter.HILO_INVERTSELL) {
               if (filter.VWAP_CROSS && (high[i-1]>MA25[i-1] || high[i-1]>MA100[i-1]) && low[i-1]<MA50[i-1] && close[i-1]>MA50[i-1] && low[i-1]<=pricestats.min_dayprice) aux_dir=0;
               if (aux_dir<-3 && filter.VWAP_CROSS && ((low[i-1]<MA25[i-1] && close[i-1]>MA25[i-1]) || (low[i-1]<MA100[i-1] && close[i-1]>MA100[i-1]))) aux_dir++;
+              if (aux_dir<-3 && filter.VWAP_CROSS && (date_candle.day_of_week==1 || date_candle.day_of_week==5) && filter.VWAP_UP && filter.HILO_INVERTSELL && filter.MIBAND_UP && filter.tdf_color!=2 && close[i-1]<MAFast[i-1] && MA25[i-1]>MA50[i-1] && MA50[i-1]>MA50[i-2] && MA100[i-1]>MA100[i-2] && open[i-1]-VWAP[i-1]>3*(VWAP[i-1]-close[i-1])) aux_dir+=3;
               if (aux_dir<-3 && CCI[i-1]<-190 && i-pricestats.vwap_idx>6 && high[i-1]<VWAP[i-1]) aux_dir+=2;
               if (aux_dir<-3 && date_candle.hour<11 && mycounters.c_down>2 && stdDev[i-1]>3*MathAbs(CCI[i-1]) && CCI[i-1]<-100 && low[i-1]<loBand[i-1]) aux_dir=0;
               if (aux_dir<-3 && date_candle.hour<12 && mycounters.c_down>1 && pricestats.hilo_count>2 && candle_lo>0 && high[i-1]<VWAP[i-1] && close[i-1]<HILO[i-2] && low[i-1]<loBand[i-1] && open[i-1]<MA25[i-1]) aux_dir=0;
