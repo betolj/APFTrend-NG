@@ -91,21 +91,21 @@ int OnCalculate(const int rates_total,
    {
    
       if (i<limit) Hlv[i]=Hlv[i+1];
-      
-      if (close[rates_total-1-i] > MAHigh[limit-i]) Hlv[i]= 1;
-      if (close[rates_total-1-i] < MALow[limit-i]) Hlv[i]= -1;
-     
-      if(Hlv[i]==-1) 
-      { 
-         ssld[i] = MAHigh[limit-i];
-         sslu[i] = MALow[limit-i];
+      if (limit>=i) {
+         if (close[rates_total-1-i] > MAHigh[limit-i]) Hlv[i]= 1;
+         if (close[rates_total-1-i] < MALow[limit-i]) Hlv[i]= -1;
+        
+         if(Hlv[i]==-1) 
+         { 
+            ssld[i] = MAHigh[limit-i];
+            sslu[i] = MALow[limit-i];
+         }
+         else 
+         {
+            ssld[i] = MALow[limit-i];
+            sslu[i] = MAHigh[limit-i];
+         }
       }
-      else 
-      {
-         ssld[i] = MALow[limit-i];
-         sslu[i] = MAHigh[limit-i];
-      }
-      
    }
    
 //--- return value of prev_calculated for next call
