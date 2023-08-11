@@ -242,6 +242,17 @@ int getSignal(const int type, const int idx, const int i, const datetime &time[]
                  aux_dir-=6;
         }
      }
+     if (i>10 && pricestats.bars_day>9 && date_candle.hour<16) {
+        bool bbsignal=(upBand[i-3]>upBand[i-2] && loBand[i-2]>loBand[i-3] && upBand[i-4]>upBand[i-3] && loBand[i-3]>loBand[i-4] && upBand[i-1]>upBand[i-2] && loBand[i-1]<loBand[i-2]);
+        if (bbsignal) {
+           if (filter.MIBAND_UP && CCI[i-1]<180 && CCI[i-1]>0 && body_up>0) {
+              if (close[i-1]>upBand[i-1] && RSI[i-1]<75 && close[i-1]>MAFast[i-1]) aux_dir+=10;
+           }
+           else if (filter.MIBAND_DOWN && CCI[i-1]>-180 && CCI[i-1]<0 && body_down>0) {
+              if (close[i-1]<loBand[i-1] && RSI[i-1]>25 && close[i-1]<MAFast[i-1]) aux_dir-=10;
+           }
+        }
+     }
 
 
      // Indicator probabilistic
